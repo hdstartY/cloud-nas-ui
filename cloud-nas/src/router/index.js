@@ -41,6 +41,7 @@ import BlogEditPage from "../components/mobile/detail/BlogEditPage.vue";
 import ContentCheckPage from "../components/dashboard/ContentCheckPage.vue";
 import ContentReportPage from "../components/dashboard/ContentReportPage.vue";
 import PersonalMessageOP from "../components/mobile/detail/PersonalMessageOP.vue"
+import HomeRightAside from "../components/mobile/dashboard/rightaside/HomeRightAside.vue"
 
 const routes = [
 
@@ -82,6 +83,7 @@ const routes = [
       {path: 'home', components: {
         left: HomeLeftAsidePage,
         main: HomePage,
+        right: HomeRightAside,
         }},
       {path: 'memberBlog', components: {
         left: MemberLeftAsidePage,

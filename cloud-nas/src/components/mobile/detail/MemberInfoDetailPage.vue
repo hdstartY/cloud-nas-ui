@@ -2,8 +2,11 @@
 <!--  总块-->
   <div>
 <!--    头像和背景块-->
-    <div @click="toChangeBackImg" class="back-img" :style="`background-image: url(${fanForm.backImg})`" style="cursor: pointer">
-
+    <div @click="toChangeBackImg" class="back-img" :style="`background-image: url(${fanForm.backImg})`" style="cursor: pointer;display: flex">
+      <div style="width: 620px;height: 1px"></div>
+      <el-affix :offset="75">
+        <el-button round plain style="background-color: rgba(128, 128, 128, 0.5); border: none; color: white;"><el-icon><MoreFilled /></el-icon></el-button>
+      </el-affix>
     </div>
 <!--    个人信息-->
     <div style="height: 100px;margin-top: 5px;">
@@ -23,10 +26,10 @@
           <!--      粉丝等-->
           <div style="height: 30px;width: 100%;">
             <div style="margin: 0 auto;height: 30px;display: flex;flex-direction: row;font-size: 15px">
-              <div class="text" style="height: 100%;align-content: center;margin-right: 10px">
+              <div @click="getFollowing()" class="text" style="height: 100%;align-content: center;margin-right: 10px">
                 关注:{{fanForm.followCounts}}
               </div>
-              <div class="text" style="height: 100%;align-content: center">
+              <div @click="getFollowed()" class="text" style="height: 100%;align-content: center">
                 粉丝:{{fanForm.fanCounts}}
               </div>
             </div>
@@ -58,7 +61,7 @@
       </div>
     </div>
   </div>
-  <el-drawer style="background-color: rgb(255,255,255,0.3);" v-model="drawer" title="I am the title" :with-header="false">
+  <el-dialog v-model="drawer" title="更改个人信息" width="680">
     <div>
 <!--      标题-->
       <div  v-if="changeStatus === 1" style="text-align: center;font-size: 20px;margin-bottom: 20px">更换头像</div>
@@ -120,24 +123,89 @@
           style="display: none"
       />
     </div>
-  </el-drawer>
+  </el-dialog>
+  <el-dialog  v-model="isShowFollow" :title="followTitle" width="500">
+    <div style="display: flex;">
+      <el-input></el-input>
+      <el-button type="info" style="margin-left: 10px">查找</el-button>
+    </div>
+    <div style="height: 600px;overflow: auto;scrollbar-width: none;">
+      <div v-for="item in followStore.following" :key="item.memberId" style="margin-top: 10px;display: flex">
+        <el-avatar size="large" :src="item.avatar"></el-avatar>
+        <div style="margin-left: 10px;display: flex;align-items: center;font-size: 16px;width: 180px">
+          {{item.nickName}}
+        </div>
+        <div style="display: flex;align-items: center">
+          <el-button type="warning" plain><el-icon><Select /></el-icon>已关注</el-button>
+        </div>
+        <div style="display: flex;align-items: center;margin-left: 5px">
+          <el-button style="width: 88px " type="info" plain><el-icon><Promotion /></el-icon>私信</el-button>
+        </div>
+        <div style="display: flex;align-items: center;margin-left: 5px">
+          <el-button style="" type="success" plain><el-icon><More /></el-icon></el-button>
+        </div>
+      </div>
+      <!-- 加载触发器，占位符，用于触发懒加载 -->
+      <div ref="loadMoreRef" v-if="followStore.followingHasMore" style="height: 10px;background-color: white"></div>
+      <!-- 加载中提示 -->
+      <div v-loading="followStore.followingLoading" element-loading-text="加载中..." v-if="followStore.followingHasMore" style="height: 100px;width: 100%;background-color: white"></div>
+      <div v-if="!followStore.followingHasMore" style="display:flex;align-items: center;justify-content: center;height: 60px;background-color: white">我也是有底线的~</div>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup>
-import {EditPen, Plus, Promotion, ZoomIn} from "@element-plus/icons-vue";
-import {onMounted, ref} from "vue";
+import {EditPen, More, MoreFilled, Plus, Promotion, Select, ZoomIn} from "@element-plus/icons-vue";
+import {onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import mRequest from "../../../utils/MemberRequest.js";
 import {ElMessage} from "element-plus";
 import {memberInfoShare} from '../../../pinia/member/MemberInfoShare.js'
+import {useFollowStore} from "../../../pinia/follow/useFollowStore.js";
 
+const loadMoreRef = ref(null)
+let observer = null;
 onMounted(() => {
   getFanDetailCounts()
+
+  // 创建 IntersectionObserver（监听元素进入视口）
+  observer = new IntersectionObserver((entries) => {
+    const entry = entries[0]
+    if (entry.isIntersecting) {
+      console.log("进入视窗")
+      followStore.getFollowing()
+    }
+  })
+
+  // 开始监听那个 div（只要它出现在屏幕里就触发加载）
+  if (loadMoreRef.value) {
+    observer.observe(loadMoreRef.value)
+  }
 })
+
+
 
 const memberInfo = ref({
 
 })
+const followStore = useFollowStore()
+const isShowFollow = ref(false)
+const followStatus = ref(0)
+const followTitle = ref('')
+
+watch(isShowFollow.value,()=>{
+  if (isShowFollow.value === false) {
+    followStore.reset()
+  }
+})
+const getFollowing = () => {
+  followTitle.value = '已关注'
+  isShowFollow.value = true;
+}
+const getFollowed = () => {
+  followTitle.value = '粉丝'
+  isShowFollow.value = true;
+}
 
 const cleanNickName = () => {
   otherInfo.value.nickName = ''

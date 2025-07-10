@@ -1,6 +1,10 @@
 <template>
   <div style="background-color: rgba(220, 223, 230, 0.64);">
-    <div v-if="blogList" class="post-card" v-for="item in blogList" :key="item.id" >
+    <div v-if="blogList"
+         class="post-card"
+         v-for="item in blogList"
+         :key="item.id"
+         >
       <!-- 用户信息 -->
       <div class="user-info">
         <el-avatar :src="item.avatar"/>
@@ -57,50 +61,50 @@
       </div>
 
       <!--      评论展开-->
-      <div style="background-color:rgb(255,255,255);height: auto; margin-top: 20px;position: relative" v-if="item.isShowComment">
-        <!--        发表评论块-->
-        <div style=" display: flex;flex-direction: row">
-          <div >
-            <el-avatar :src="memberStore.avatarUrl" style="font-size: 20px;width: 30px;height: 30px"/>
+        <div style="background-color:rgb(255,255,255);height: auto; position: relative;padding-top: 20px" v-if="item.isShowComment">
+          <!--        发表评论块-->
+          <div style=" display: flex;flex-direction: row">
+            <div >
+              <el-avatar  :src="memberStore.avatarUrl" style="font-size: 20px;width: 30px;height: 30px"/>
+            </div>
+            <div style="margin-left: 8px">
+              <el-input @keyup.enter="publishComment(item)" v-model="item.commentValue" style="width: 590px;height: 35px;border: skyblue" placeholder="输入你的评论"></el-input>
+            </div>
           </div>
-          <div style="margin-left: 8px">
-            <el-input @keyup.enter="publishComment(item)" v-model="item.commentValue" style="width: 590px;height: 35px;border: skyblue" placeholder="输入你的评论"></el-input>
+          <div style="margin-top: 10px;margin-left: 36px;display: flex;width: 590px;justify-content: space-between">
+            <div>
+              <div></div>
+              <div><el-button style="border: 0px;width: 30px"><el-icon size="20px" style="color:rgb(131, 131, 131);"><camera/></el-icon></el-button></div>
+            </div>
+            <div>
+              <el-button @click="publishComment(item)" type="primary" round>评论</el-button>
+            </div>
           </div>
-        </div>
-        <div style="margin-top: 10px;margin-left: 36px;display: flex;width: 590px;justify-content: space-between">
-          <div>
-            <div></div>
-            <div><el-button style="border: 0px;width: 30px"><el-icon size="20px" style="color:rgb(131, 131, 131);"><camera/></el-icon></el-button></div>
-          </div>
-          <div>
-            <el-button @click="publishComment(item)" type="primary" round>评论</el-button>
-          </div>
-        </div>
-        <!--        评论内容-->
-        <div style="margin-top: 10px;">
-          <span style="margin-right: 20px" @click="isClicked = isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':isClicked}" class="clickable-text">按热度</span><span @click="isClicked = !isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':!isClicked}" class="clickable-text">按时间</span>
-        </div>
-        <div style="height: 50px;width: 626px;text-align: center;margin-top: 20px;" v-if="item.comments.length === 0">
-          评论区空空如也，去发表你的评论吧~
-        </div>
-        <div v-if="item.comments.length > 0" v-for="comment in item.comments" :key="comment.id">
-          <div>
-            <div style="margin-top: 10px;display:flex;flex-direction: row">
-              <el-avatar @click="toComPublisherDetail(comment)" v-if="comment.avatar" :src="comment.avatar" style="font-size: 20px;width: 30px;height: 30px"  class="avatar"/>
-              <div style="margin-left: 5px;width: 420px">
-                <div style="font-size: 13px;font-weight: 500;color: rgb(64, 158, 255)" class="clickable-text" @click="reply(comment,item)">{{ comment.commentNickName }}</div>
-                <div style="font-size: 12px;color: rgb(147,147,147)">{{ comment.createTime }}</div>
+          <!--        评论内容-->
+            <div style="margin-top: 10px;">
+              <span style="margin-right: 20px" @click="isClicked = isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':isClicked}" class="clickable-text">按热度</span><span @click="isClicked = !isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':!isClicked}" class="clickable-text">按时间</span>
+            </div>
+            <div style="height: 50px;width: 626px;text-align: center;margin-top: 20px;" v-if="item.comments.length === 0">
+              评论区空空如也，去发表你的评论吧~
+            </div>
+            <div v-if="item.comments.length > 0" v-for="comment in item.comments" :key="comment.id">
+              <div>
+                <div style="margin-top: 10px;display:flex;flex-direction: row">
+                  <el-avatar @click="toComPublisherDetail(comment)" v-if="comment.avatar" :src="comment.avatar" style="font-size: 20px;width: 30px;height: 30px"  class="avatar"/>
+                  <div style="margin-left: 5px;width: 420px">
+                    <div style="font-size: 13px;font-weight: 500;color: rgb(64, 158, 255)" class="clickable-text" @click="reply(comment,item)">{{ comment.commentNickName }}</div>
+                    <div style="font-size: 12px;color: rgb(147,147,147)">{{ comment.createTime }}</div>
+                  </div>
+                </div>
+                <div style="font-size: 13px;margin-left: 35px;margin-top: 5px">
+                  {{comment.textContent}}
+                </div>
               </div>
             </div>
-            <div style="font-size: 13px;margin-left: 35px;margin-top: 5px">
-              {{comment.textContent}}
+            <div @click="toBlogDetailPage(item)" class="clickable-text" style="text-align: center;width: 626px;height: 24px;margin-bottom: 5px;margin-top: 15px" v-if="item.comments.length > 0">
+              查看详情及全部评论<el-icon><arrow-right /></el-icon>
             </div>
-          </div>
         </div>
-        <div @click="toBlogDetailPage(item)" class="clickable-text" style="text-align: center;width: 626px;height: 24px;margin-bottom: 5px;margin-top: 15px" v-if="item.comments.length > 0">
-          查看详情及全部评论<el-icon><arrow-right /></el-icon>
-        </div>
-      </div>
     </div>
 
     <!-- 加载触发器，占位符，用于触发懒加载 -->
@@ -125,7 +129,7 @@ import {
   Plus,
   Pointer, Star,
 } from "@element-plus/icons-vue";
-import {computed, onMounted, onUnmounted, reactive, ref,onBeforeUnmount,watch} from "vue";
+import {computed, onMounted, onUnmounted, reactive, ref, onBeforeUnmount, watch, nextTick} from "vue";
 import mRequest from "../../../../utils/MemberRequest.js";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {useRouter,useRoute} from "vue-router";
@@ -135,9 +139,16 @@ import {storeToRefs} from "pinia";
 import {memberInfoShare} from "../../../../pinia/member/MemberInfoShare.js";
 import {publisherMemberIdShare} from "../../../../pinia/detail/PublisherMemberIdShare.js";
 import {memberEditBlogShare} from "../../../../pinia/member/MemberEditBlogShare.js";
+import {useHomeScrollStore} from "../../../../pinia/scroll/UseHomeScrollStore.js";
+import 'element-plus/es/components/collapse-transition/style/css'
 
 const loadMoreRef = ref(null)
 let observer = null;
+const scrollContainer = ref(null)
+const homeScrollStore = useHomeScrollStore()
+const route = useRoute()
+const itemRefs = ref([]);
+const visibleSet = reactive(new Set());
 onMounted(() => {
   storeMemberId.value = memberStore.memberId
   if (memberStore.memberId !== '') {
@@ -160,6 +171,8 @@ onMounted(() => {
   if (loadMoreRef.value) {
     observer.observe(loadMoreRef.value)
   }
+  // restoreScrollPosition()
+
 })
 onBeforeUnmount(() => {
   // 页面销毁前停止监听
@@ -167,6 +180,37 @@ onBeforeUnmount(() => {
     observer.unobserve(loadMoreRef.value)
   }
 })
+// // 保存滚动位置
+// const handleScroll = debounce(() => {
+//   homeScrollStore.savePosition(route.name, scrollContainer.value.scrollTop);
+// },200);
+//
+// // 恢复滚动位置
+// const restoreScrollPosition = () => {
+//   const position = homeScrollStore.getPosition(route.name);
+//   if (position) {
+//     scrollContainer.value.scrollTop = position;
+//   }
+// };
+//
+// // 监听路由变化
+// watch(() => route.name, (to, from) => {
+//   // 保存旧路由的滚动位置
+//   if (from && scrollContainer.value) {
+//     homeScrollStore.savePosition(from, scrollContainer.value.scrollTop);
+//   }
+//
+//   // 进入新页面时恢复滚动位置
+//   if (to) {
+//     // 使用nextTick确保DOM已更新
+//     nextTick(() => {
+//       const position = homeScrollStore.getPosition(to);
+//       if (position) {
+//         scrollContainer.value.scrollTop = position;
+//       }
+//     });
+//   }
+// });
 
 const memberStore = memberInfoShare()
 const router = useRouter();
@@ -479,6 +523,7 @@ const getMemberBlogs = async () => {
 }
 
 import {useBlogDetailStore} from "../../../../pinia/detail/UseBlogDetailStore.js";
+import {debounce} from "lodash";
 const blogDetailStore = useBlogDetailStore()
 const toBlogDetailPage = (item) => {
   blogDetailStore.blogDetail = item

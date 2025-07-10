@@ -56,7 +56,7 @@
         </div>
 <!--        右边内容栏-->
         <div class="right-content">
-
+          <router-view name="right"></router-view>
         </div>
       </div>
     </div>
@@ -202,6 +202,7 @@ const avatarUrl = ref('')
   height: 100%;
   display: flex;
   flex-direction: row;
+  /*opacity: 0.8;*/
 }
 .nav-main {
   width: 680px;
@@ -234,6 +235,7 @@ const avatarUrl = ref('')
 }
 .main-body {
   overflow: auto;
+  scrollbar-width: none;
   margin-top: 65px;
   position: fixed;
   background-color: rgba(220, 223, 230, 0.64);

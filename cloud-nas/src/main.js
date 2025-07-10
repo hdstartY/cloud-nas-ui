@@ -6,6 +6,7 @@ import 'element-plus/dist/index.css'
 import {zhCn} from "element-plus/es/locale/index";
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import 'animate.css';
 
 var app = createApp(App)
 const pinia = createPinia()

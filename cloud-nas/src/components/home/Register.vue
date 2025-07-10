@@ -15,6 +15,9 @@
       <div style="margin-top: 20px">
         <input type="password" placeholder="确认密码" class="custom-input" v-model="secondInputPassword">
       </div>
+      <div style="margin-top: 20px">
+        <input type="text" placeholder="邀请码" class="custom-input" v-model="secondInputPassword">
+      </div>
       <div style="margin-top: 15px"><el-button round type="warning" size="large" style="width: 300px" @click="register">注册</el-button></div>
       <div style="display: flex;margin-top: 5px"><div style="width: 140px;padding-top:5px "><hr></div><div style="width: 20px;font-size: 16px;align-items: center;color: black">或</div><div style="width: 140px; padding-top:5px "><hr></div></div>
       <div style="margin-top: 5px"><el-button round type="primary" size="large" style="width: 300px" @click="toLogin">去登陆</el-button></div>

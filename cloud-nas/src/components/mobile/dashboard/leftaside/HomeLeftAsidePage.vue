@@ -5,17 +5,20 @@
       首页
     </div>
 <!--    切换按钮-->
-    <div @click="toRecommend()" class="box2" :class="{'text-selected':selectItemNum ===1}" style="font-size: 20px;display: flex;flex-direction: row;margin-top: 30px;padding-left: 20px">
+    <div @click="toRecommend()" class="box2" :class="{'text-selected':blogStore.selectItem ===1}" style="font-size: 20px;display: flex;flex-direction: row;margin-top: 30px;padding-left: 20px">
       <div style="display: flex;align-items: center"><el-icon><histogram /></el-icon></div>推荐
     </div>
-    <div @click="toNew()" class="box2" :class="{'text-selected':selectItemNum ===2}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
+    <div @click="toNew()" class="box2" :class="{'text-selected':blogStore.selectItem ===2}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
       <div style="display: flex;align-items: center"><el-icon><refresh /></el-icon></div>最新
+    </div>
+    <div @click="toCategory()" class="box2" :class="{'text-selected':blogStore.selectItem ===3}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
+      <div style="display: flex;align-items: center"><el-icon><Operation /></el-icon></div>分类
     </div>
   </div>
 </template>
 
 <script setup>
-import {Histogram, Refresh, TrendCharts} from "@element-plus/icons-vue";
+import {Histogram, Operation, Refresh, TrendCharts} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import {ref} from "vue";
 import {homeBlogStore} from "../../../../pinia/honeBlog/HomeBlogShared.js";
@@ -25,13 +28,16 @@ const blogStore = homeBlogStore()
 
 const selectItemNum = ref(1)
 const toRecommend = () => {
-  selectItemNum.value = 1;
+  blogStore.selectItem = 1;
   blogStore.sortField = 'default'
   router.push("/mobileDashboard/home")
 }
 const toNew = () => {
   blogStore.sortField = 'b.create_time'
-  selectItemNum.value = 2
+  blogStore.selectItem = 2
+}
+const toCategory = () => {
+  blogStore.selectItem = 3
 }
 </script>
 

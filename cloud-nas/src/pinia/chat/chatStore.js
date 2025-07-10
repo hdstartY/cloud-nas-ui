@@ -66,35 +66,43 @@ export const useChatStore = defineStore('chat', () => {
             }
         }
 
-        function sendMessage(message) {
+        function sendMessage(message,status) {
             if (this.connected && this.socket) {
-                let json = memberInfoStore.memberId + ":" + receiveId.value + ":" + message
-                console.log(json)
-                this.socket.send(json);
-                let save = memberInfoStore.memberNickName + ":" + memberInfoStore.memberId + ":" + receiveId.value + ":" + message
-                addMessage(save)
+                // let json = memberInfoStore.memberId + ":" + receiveId.value + ":" + message
+                const msgObj = {sendId: memberInfoStore.memberId,sendNickName: memberInfoStore.memberNickName,receiveId: receiveId.value,status: status,message: message}
+                const msgJson = JSON.stringify(msgObj);
+                // console.log(msgJson)
+                // console.log(json)
+                this.socket.send(msgJson);
+                // let save = memberInfoStore.memberNickName + ":" + memberInfoStore.memberId + ":" + receiveId.value + ":" + message
+                addMessage(msgJson)
                 // 在控制台打印发送的消息，方便调试
                 console.log('发送消息:', message);
             }
         }
 
         function addMessage(message) {
-            const arr = message.split(":")
-            console.log(arr)
-            const json = {
-                sendId: arr[1],
-                receiveId: arr[2],
-                message: arr[3]
-            }
-            chatMessages.value.push(json);
-            if (Number(arr[1]) !== Number(memberInfoStore.memberId)) {
-                if (chatWithId.value !== Number(arr[1])) {
+            // const arr = message.split(":")
+            const msgObj = JSON.parse(message);
+            chatMessages.value.push(msgObj);
+            if (Number(msgObj.sendId) !== Number(memberInfoStore.memberId)) {
+                if (chatWithId.value !== Number(msgObj.sendId)) {
                     ElNotification({
                         title: '新消息',
-                        message: h('span', [
-                            h('span', { style: 'color: orange' }, arr[0] + ": "),
-                            h('span', { style: 'color: skyblue' }, arr[3])
-                        ]),
+                        message: h(
+                            'div',
+                            {
+                                style: 'cursor: pointer',
+                                onClick: () => {
+                                    alert('通知被点击了')
+                                    // 可以在这里跳转、打开弹窗、做别的处理
+                                }
+                            },
+                            [
+                                h('span', { style: 'color: orange' }, msgObj.sendNickName + ': '),
+                                h('span', { style: 'color: skyblue' }, msgObj.status === 0?msgObj.message:"图片")
+                            ]
+                        ),
                         showClose: false
                     })
                 }

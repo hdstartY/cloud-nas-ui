@@ -9,6 +9,7 @@ export const homeBlogStore = defineStore('blog', () => {
     const currentPage = ref(1);
     const hasMore = ref(true);
     const loading = ref(true)
+    const selectItem = ref(1)
 
     // 触发刷新
     const blogList = ref([
@@ -139,7 +140,10 @@ export const homeBlogStore = defineStore('blog', () => {
         loading,
         reset,
         fetchBlogs,
+        selectItem,
         fetchBlogsBySort,
+        currentPage,
+        sortCurrentPage
     }
 
 

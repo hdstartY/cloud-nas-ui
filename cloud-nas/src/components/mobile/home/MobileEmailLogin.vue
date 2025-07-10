@@ -14,7 +14,10 @@
       <div style="margin-top: 5px"><el-button round type="primary" size="large" style="width: 300px" @click="toPhoneLogin">手机登录</el-button></div>
       <div style="margin-top: 10px"><el-button round type="success" size="large" style="width: 300px" @click="toRegister">创建账号</el-button></div>
       <div>
-        <div style="margin-top: 30px;color: black">管理员身份？</div>
+        <div style="display:flex;width: 300px;justify-content: space-between">
+          <div style="margin-top: 30px;color: black">管理员身份？</div>
+          <div style="margin-top: 30px;" class="forgotPassword">忘记密码？</div>
+        </div>
         <div style="margin-top: 10px"><el-button round type="primary" size="large" style="width: 300px" plain @click="toAdminLogin()">切换</el-button></div>
       </div>
     </div>
@@ -73,6 +76,13 @@
 </script>
 
 <style scoped>
+.forgotPassword{
+  cursor: pointer;
+  color: orange;
+}
+.forgotPassword:hover{
+  color: skyblue;
+}
 .login-form {
   height: 600px;
   width: 400px;

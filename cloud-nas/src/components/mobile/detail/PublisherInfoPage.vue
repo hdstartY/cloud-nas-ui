@@ -88,7 +88,7 @@ onMounted(() => {
     getPublisherInfo();
 })
 onBeforeUnmount(() => {
-  publisherStore.reset();
+
 })
 
 const publisherStore = publisherMemberIdShare()
