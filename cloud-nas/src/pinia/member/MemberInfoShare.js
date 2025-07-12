@@ -9,32 +9,6 @@ export const memberInfoShare = defineStore('member', () => {
         const avatarUrl = ref('')
         const memberNickName = ref('')
 
-        async function demo() {
-            // 请求
-            try {
-                const response = await mRequest.get("/blog/list", {
-                    params: {
-                        orderType: sortField.value
-                    }
-                })
-                console.log(response.data)
-                if (response.data.code === 200) {
-                    blogList.value = response.data.data
-                    loading.value = false
-                } else {
-                    ElMessage({
-                        type: 'warning',
-                        message: response.data.msg
-                    })
-                }
-            } catch (error) {
-                ElMessage({
-                    type: 'error',
-                    message: error.message
-                })
-            }
-        }
-
         function reset() {
             memberId.value = ''
             avatarUrl.value = ''

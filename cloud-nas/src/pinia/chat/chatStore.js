@@ -3,10 +3,12 @@ import {memberInfoShare} from "../member/MemberInfoShare.js";
 import {h, ref} from "vue";
 import mRequest from "../../utils/MemberRequest.js";
 import {ElMessage, ElNotification} from "element-plus";
+import {useMessageOPStore} from "./UseMessageOPStore.js";
 
 export const useChatStore = defineStore('chat', () => {
 
         const memberInfoStore = memberInfoShare()
+        const messageOPStore = useMessageOPStore()
 
         const socket = ref(null)
         const chatMessages = ref([])
@@ -87,6 +89,7 @@ export const useChatStore = defineStore('chat', () => {
             chatMessages.value.push(msgObj);
             if (Number(msgObj.sendId) !== Number(memberInfoStore.memberId)) {
                 if (chatWithId.value !== Number(msgObj.sendId)) {
+                    messageOPStore.newsNums += 1;
                     ElNotification({
                         title: '新消息',
                         message: h(

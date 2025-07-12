@@ -13,6 +13,8 @@
       </div>
     </div>
 
+
+
 <!--    具体内容-->
     <div><router-view></router-view></div>
   </div>
@@ -21,6 +23,7 @@
 
 <script setup>
 
+import {Message} from "@element-plus/icons-vue";
 </script>
 
 <style scoped>

@@ -11,7 +11,7 @@
       <div class="header-nav">
 <!--      搜索框-->
         <div style="width: 200px;padding: 10px 0px">
-          <input @keyup.enter="toFind()" class="input-define" placeholder="搜索">
+          <el-input :suffix-icon="Search" v-model="blogSearchStore.searchValue" @keyup.enter="toFind()" style="width: 200px;height: 40px" placeholder="搜索" />
         </div>
 <!--       导航-->
         <div class="nav-main">
@@ -19,9 +19,14 @@
           <el-tooltip content="关注" effect="light"><div class="main-nav nav-follow box" :class="{'text-selected':boxSelect === 2}" @click="toFollowedMembersPage()" ><el-icon style="font-size: 25px"><star/></el-icon></div></el-tooltip>
           <el-tooltip content="我的" effect="light"><div class="main-nav nav-own box" :class="{'text-selected':boxSelect === 3}" @click="toMemberBlog()" ><el-icon style="font-size: 25px"><user-filled /></el-icon></div></el-tooltip>
           <el-tooltip content="信息" effect="light">
-            <div class="main-nav nav-message box" :class="{'text-selected':boxSelect === 4}" @click="toMemberMessagePage()">
-              <el-icon style="font-size: 25px"><message /></el-icon>
-            </div></el-tooltip>
+            <div  style="width: 136px;display: flex;justify-content: center;padding-top: 18px" class="msgbox" :class="{'text-selected':boxSelect === 4}" @click="toMemberMessagePage()">
+              <el-badge :value="messageOPStore.newsNums" class="mark" :max="99" :show-zero="false">
+                <el-icon style="font-size: 25px">
+                  <message />
+                </el-icon>
+              </el-badge>
+            </div>
+          </el-tooltip>
           <div class="main-nav">
             <el-dropdown v-if="memberStore.memberId !== ''" placement="bottom">
               <el-avatar v-if="memberStore.memberId !== '' " :src="memberStore.avatarUrl" class="avatar" :class="{'avatar-selected':boxSelect === 0}"/>
@@ -64,7 +69,7 @@
 </template>
 
 <script setup>
-import {HomeFilled, Message, Star, UserFilled} from "@element-plus/icons-vue";
+import {HomeFilled, Message, Star, UserFilled,Search} from "@element-plus/icons-vue";
 import {useRouter,useRoute} from "vue-router";
 import {onBeforeUnmount, onMounted, ref,watch,nextTick} from "vue";
 import {ElMessage} from "element-plus";
@@ -77,8 +82,10 @@ import { debounce } from 'lodash';
 import {useChatStore} from "../../pinia/chat/chatStore.js";
 import {memberBlogShare} from "../../pinia/member/MemberBlogShare.js";
 import {useBlogDetailStore} from "../../pinia/detail/UseBlogDetailStore.js";
+import {useMessageOPStore} from "../../pinia/chat/UseMessageOPStore.js";
+import {useBlogSearchStore} from "../../pinia/search/useBlogSearchStore.js";
 
-
+const messageOPStore = useMessageOPStore()
 const boxSelect = ref(1)
 const followedStore = followedMembersStore()
 const homeStore = homeBlogStore()
@@ -90,6 +97,7 @@ const scrollContainer = ref(null)
 const route = useRoute()
 const scrollStore = useScrollStore()
 const memberBlogStore = memberBlogShare()
+const blogSearchStore = useBlogSearchStore()
 
 // 保存滚动位置
 const handleScroll = debounce(() => {
@@ -127,10 +135,21 @@ onMounted (() => {
   // 初始加载时恢复滚动位置
   restoreScrollPosition();
   chatStore.connect();
+  if (memberStore.memberId !== '') {
+    messageOPStore.getPointMessages()
+  }
 })
 
 const toFind = () => {
-  alert("搜索")
+  if (blogSearchStore.searchValue === '') {
+    ElMessage({
+      type: 'warning',
+      message: "搜索内容不能为空!!!"
+    })
+    return;
+  }
+  blogSearchStore.currentPage = 1;
+  router.push("/mobileDashboard/homeSearch")
 }
 
 const toLogin = () =>  {
@@ -154,6 +173,7 @@ const logout = () => {
   memberStore.reset();
   memberBlogStore.reset();
   chatStore.disconnect();
+
   router.push("/")
 }
 const toRecover = () => {
@@ -183,6 +203,9 @@ const avatarUrl = ref('')
 </script>
 
 <style scoped>
+.msgbox:hover{
+  background-color: rgb(208, 237, 250); /* 鼠标移上来时的颜色 */
+}
 .main-box {
   width: 100vw;
   height: 100vh;

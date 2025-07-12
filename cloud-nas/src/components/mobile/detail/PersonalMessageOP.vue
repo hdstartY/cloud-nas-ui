@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
     <div class="message-header">
       信息
     </div>
@@ -10,11 +10,11 @@
     </div>
 
 <!--    私信信息-->
-    <div v-if="PointMessageForm.length > 0" @click="toMessageDetail(item)" class="person-message-box" v-for="item in PointMessageForm" :key="item.memberId">
+    <div v-if="messageOPStore.pointMessageForm.length > 0" @click="toMessageDetail(item)" class="person-message-box" v-for="item in messageOPStore.pointMessageForm" :key="item.memberId">
       <div style="display: flex;width: 600px">
         <div class="person-avatar-box"><el-avatar :src="item.avatar" /></div><div class="person-nickName-box">{{item.nickName}}</div>
       </div>
-      <el-badge v-if="item.newsNum > 0" :value="item.newsNum" :max="99"/>
+      <el-badge :value="item.newsNum" :max="99" :show-zero="false"/>
     </div>
   </div>
 </template>
@@ -27,11 +27,12 @@ import {memberInfoShare} from "../../../pinia/member/MemberInfoShare.js";
 import {useRouter} from "vue-router";
 import {useChatStore} from "../../../pinia/chat/chatStore.js";
 import {ElMessage} from "element-plus";
+import {useMessageOPStore} from "../../../pinia/chat/UseMessageOPStore.js";
 
+const messageOPStore = useMessageOPStore()
 const memberInfoStore = memberInfoShare()
 const chatStore = useChatStore()
 const router = useRouter()
-
 onMounted(() => {
   if (memberInfoStore.memberId === '') {
     ElMessage({
@@ -41,11 +42,8 @@ onMounted(() => {
     router.push("/phoneLogin")
     return;
   }
-  getPointMessages();
+  messageOPStore.getPointMessages()
 })
-
-const PointMessageForm = ref([])
-
 
 const toMessageDetail = (item) => {
   chatStore.chatMessages = []
@@ -57,22 +55,6 @@ const toMessageDetail = (item) => {
   chatStore.hasMore = true;
   chatStore.chatWithId = item.memberId
   router.push("/mobileDashboard/messageDetail")
-}
-const getPointMessages = async () => {
-  try {
-    const response = await mRequest.get("/pointMessage/getNotRedMessages",{
-      params: {
-        memberId: memberInfoStore.memberId
-      }
-    })
-    if (response.data.code === 200) {
-      PointMessageForm.value = response.data.data
-    } else {
-      console.log(response.data.msg)
-    }
-  } catch (e) {
-    console.log(e.message)
-  }
 }
 </script>
 

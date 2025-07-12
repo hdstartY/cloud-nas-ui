@@ -260,6 +260,8 @@ const toDeleteBlog = (blogId) => {
           type: 'success',
           message: '删除成功，博客以已移入回收站'
         })
+        //TODO 优化，改为直接从数组中移除
+        memberBlogStore.reset();
         memberBlogStore.fetchMemberBlogList();
       } else {
         ElMessage({

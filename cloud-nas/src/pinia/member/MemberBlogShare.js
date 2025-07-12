@@ -81,7 +81,6 @@ export const memberBlogShare = defineStore('memberBlog', () => {
         loading.value = true;
         currentPage.value = 1;
         hasMore.value = true;
-        currentPage.value = 1
     }
 
 

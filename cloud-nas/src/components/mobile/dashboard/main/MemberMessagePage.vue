@@ -17,7 +17,7 @@
       <div style="display:flex;align-items: center;margin-top: 10px;width: 100%" v-for="item in chatStore.chatMessages">
         <div style="display: flex" v-if="Number(item.sendId) === Number(chatStore.receiveId)">
           <div style="margin-right: 10px" v-if="Number(item.sendId) === Number(chatStore.receiveId)">
-            <el-avatar  :src="chatStore.receiveAvatar"/>
+            <el-avatar shape="square"  :src="chatStore.receiveAvatar"/>
           </div>
           <div>
             <div v-if="item.status === 0" class="message-box">
@@ -60,7 +60,7 @@
             </div>
           </div>
           <div style="margin-left: 10px" v-if="Number(item.sendId) === Number(memberInfoStore.memberId)">
-            <el-avatar  :src="memberInfoStore.avatarUrl"/>
+            <el-avatar shape="square"  :src="memberInfoStore.avatarUrl"/>
           </div>
         </div>
 <!--        <div style="margin-right: 10px" v-if="Number(item.sendId) === Number(chatStore.receiveId)">-->
@@ -94,7 +94,7 @@
       </div>
     </div>
     <el-collapse-transition>
-      <div v-if="isShowOtherChoice" style="height: 300px;background-color: rgba(220, 223, 230, 0.64)">
+      <div v-if="isShowOtherChoice" style="height: 150px;background-color: rgba(220, 223, 230, 0.64)">
         <div style="display:flex; width: 100%;background-color: white;">
           <div style="height: 50px;padding-left: 20px">
             <el-button circle :icon="Plus"></el-button>
@@ -109,7 +109,7 @@
         </div>
     </el-collapse-transition>
   </div>
-  <el-dialog v-model="sendPicture" title="发送图片" width="660">
+  <el-dialog v-model="sendPicture" title="发送图片" width="660" :draggable="true" style="">
     <div style="color:red;margin-bottom: 10px">注意：单张图片大小不可超过10mb，最多一次性发送12张图片</div>
     <div style="">
       <el-upload

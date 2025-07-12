@@ -42,6 +42,9 @@ import ContentCheckPage from "../components/dashboard/ContentCheckPage.vue";
 import ContentReportPage from "../components/dashboard/ContentReportPage.vue";
 import PersonalMessageOP from "../components/mobile/detail/PersonalMessageOP.vue"
 import HomeRightAside from "../components/mobile/dashboard/rightaside/HomeRightAside.vue"
+import HomeSearch from "../components/mobile/dashboard/main/HomeSearch.vue"
+import SearchBlogDetail from "../components/mobile/detail/SearchBlogDetail.vue"
+import SearchMemberDetail from "../components/mobile/detail/SearchMemberDetail.vue"
 
 const routes = [
 
@@ -154,6 +157,14 @@ const routes = [
           left: BlankPage,
           main: BlogEditPage,
       }},
+      {path: 'homeSearch', components: {
+          left: BlankPage,
+          main: HomeSearch,
+      },children: [
+          {path: '',redirect: '/mobileDashboard/homeSearch/searchBlog'},
+          {path: 'searchBlog',component: SearchBlogDetail },
+          {path: 'searchMember',component: SearchMemberDetail },
+      ]},
     ]
   },
 ]
