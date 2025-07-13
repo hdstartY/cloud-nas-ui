@@ -71,24 +71,20 @@
 <script setup>
 import {HomeFilled, Message, Star, UserFilled,Search} from "@element-plus/icons-vue";
 import {useRouter,useRoute} from "vue-router";
-import {onBeforeUnmount, onMounted, ref,watch,nextTick} from "vue";
+import {onMounted, ref,watch,nextTick} from "vue";
 import {ElMessage} from "element-plus";
-import {followedMembersStore} from "../../pinia/follow/FollowedMemberIdsShare.js";
-import {homeBlogStore} from "../../pinia/honeBlog/HomeBlogShared.js";
 import {publisherMemberIdShare} from "../../pinia/detail/PublisherMemberIdShare.js";
 import {memberInfoShare} from "../../pinia/member/MemberInfoShare.js";
 import {useScrollStore} from "../../pinia/honeBlog/ScrollShare.js";
 import { debounce } from 'lodash';
 import {useChatStore} from "../../pinia/chat/chatStore.js";
-import {memberBlogShare} from "../../pinia/member/MemberBlogShare.js";
-import {useBlogDetailStore} from "../../pinia/detail/UseBlogDetailStore.js";
 import {useMessageOPStore} from "../../pinia/chat/UseMessageOPStore.js";
 import {useBlogSearchStore} from "../../pinia/search/useBlogSearchStore.js";
+import {useResetTool} from "../../pinia/UseResetTool.js";
 
+const resetTool = useResetTool()
 const messageOPStore = useMessageOPStore()
 const boxSelect = ref(1)
-const followedStore = followedMembersStore()
-const homeStore = homeBlogStore()
 const publisherStore = publisherMemberIdShare()
 const memberStore = memberInfoShare();
 const chatStore = useChatStore()
@@ -96,44 +92,43 @@ const router = useRouter();
 const scrollContainer = ref(null)
 const route = useRoute()
 const scrollStore = useScrollStore()
-const memberBlogStore = memberBlogShare()
 const blogSearchStore = useBlogSearchStore()
 
 // 保存滚动位置
-const handleScroll = debounce(() => {
-  scrollStore.savePosition(route.name, scrollContainer.value.scrollTop);
-},200);
+// const handleScroll = debounce(() => {
+//   scrollStore.savePosition(route.name, scrollContainer.value.scrollTop);
+// },200);
 
-// 恢复滚动位置
-const restoreScrollPosition = () => {
-  const position = scrollStore.getPosition(route.name);
-  if (position) {
-    scrollContainer.value.scrollTop = position;
-  }
-};
+// // 恢复滚动位置
+// const restoreScrollPosition = () => {
+//   const position = scrollStore.getPosition(route.name);
+//   if (position) {
+//     scrollContainer.value.scrollTop = position;
+//   }
+// };
 
-// 监听路由变化
-watch(() => route.name, (to, from) => {
-  // 保存旧路由的滚动位置
-  if (from && scrollContainer.value) {
-    scrollStore.savePosition(from, scrollContainer.value.scrollTop);
-  }
-
-  // 进入新页面时恢复滚动位置
-  if (to) {
-    // 使用nextTick确保DOM已更新
-    nextTick(() => {
-      const position = scrollStore.getPosition(to);
-      if (position) {
-        scrollContainer.value.scrollTop = position;
-      }
-    });
-  }
-});
+// // 监听路由变化
+// watch(() => route.name, (to, from) => {
+//   // 保存旧路由的滚动位置
+//   if (from && scrollContainer.value) {
+//     scrollStore.savePosition(from, scrollContainer.value.scrollTop);
+//   }
+//
+//   // 进入新页面时恢复滚动位置
+//   if (to) {
+//     // 使用nextTick确保DOM已更新
+//     nextTick(() => {
+//       const position = scrollStore.getPosition(to);
+//       if (position) {
+//         scrollContainer.value.scrollTop = position;
+//       }
+//     });
+//   }
+// });
 
 onMounted (() => {
   // 初始加载时恢复滚动位置
-  restoreScrollPosition();
+  // restoreScrollPosition();
   chatStore.connect();
   if (memberStore.memberId !== '') {
     messageOPStore.getPointMessages()
@@ -168,11 +163,7 @@ const logout = () => {
     type: "success",
     message: "退出登录成功",
   })
-  followedStore.reset();
-  homeStore.reset();
-  memberStore.reset();
-  memberBlogStore.reset();
-  chatStore.disconnect();
+  resetTool.reset()
 
   router.push("/")
 }

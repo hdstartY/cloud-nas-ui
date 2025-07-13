@@ -45,6 +45,7 @@ import HomeRightAside from "../components/mobile/dashboard/rightaside/HomeRightA
 import HomeSearch from "../components/mobile/dashboard/main/HomeSearch.vue"
 import SearchBlogDetail from "../components/mobile/detail/SearchBlogDetail.vue"
 import SearchMemberDetail from "../components/mobile/detail/SearchMemberDetail.vue"
+import SearchAllDetail from "../components/mobile/detail/SearchAllDetail.vue"
 
 const routes = [
 
@@ -161,9 +162,10 @@ const routes = [
           left: BlankPage,
           main: HomeSearch,
       },children: [
-          {path: '',redirect: '/mobileDashboard/homeSearch/searchBlog'},
+          {path: '',redirect: '/mobileDashboard/homeSearch/searchAll'},
           {path: 'searchBlog',component: SearchBlogDetail },
           {path: 'searchMember',component: SearchMemberDetail },
+          {path: 'searchAll',component: SearchAllDetail },
       ]},
     ]
   },

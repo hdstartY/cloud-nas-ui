@@ -1,10 +1,8 @@
-// src/stores/blog.js
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 import mRequest from "../../utils/MemberRequest.js";
 import {ElMessage} from "element-plus";
 import {memberInfoShare} from "../member/MemberInfoShare.js";
-import {homeBlogStore} from "../honeBlog/HomeBlogShared.js";
 
 
 export const followedMembersStore = defineStore('followed', () => {
@@ -99,10 +97,13 @@ export const followedMembersStore = defineStore('followed', () => {
                 }
             })
             if (response.data.code === 200) {
-                allFollowedIds.value = response.data.data
-                if (allFollowedIds.value.length === 0 ) {
+                if (response.data.data.length > 0) {
+                    allFollowedIds.value = response.data.data
+                    fetchFollowedBlogs();
+                } else {
                     loading.value = false
-                    return;
+                    hasMore.value = false
+                    console.log("*******************************")
                 }
             } else {
                 console.log(response.data.msg)
@@ -113,7 +114,6 @@ export const followedMembersStore = defineStore('followed', () => {
     }
 
     function reset() {
-        allFollowedIds.value = []
         followedBlogList.value = []
         followedSortField.value = 'b.create_time'
         currentPage.value = 1;

@@ -88,6 +88,7 @@ export const memberBlogShare = defineStore('memberBlog', () => {
         memberBlogList,
         loading,
         hasMore,
+        currentPage,
         reset,
         fetchMemberBlogList,
     }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {ElMessage} from "element-plus";
 import router from '../router/index.js'
-import {memberInfoShare} from "../pinia/member/MemberInfoShare.js";
+import {useResetTool} from "../pinia/UseResetTool.js";
 
 
 const instance = axios.create({
@@ -33,8 +33,8 @@ instance.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             ElMessage.warning(error.response.data.msg);
             localStorage.clear();
-            const memberInfoStore = memberInfoShare()
-            memberInfoStore.reset();
+            const resetTool = useResetTool()
+            resetTool.reset();
             router.push('/phoneLogin') // 跳转登录页
         }
         return Promise.reject(error)

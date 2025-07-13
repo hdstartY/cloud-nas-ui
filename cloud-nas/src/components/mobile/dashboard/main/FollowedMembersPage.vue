@@ -1,11 +1,6 @@
 <template>
   <div style="background-color: rgba(220, 223, 230, 0.64);">
-    <div v-if="allFollowedSet.size === 0" style="text-align: center;font-size: 25px;background-color: white;color: skyblue">
-      <div style="margin-bottom: 30px;margin-top: 60px;">当前没有关注的人哦~</div>
-        ⬇
-      <img style="width: 100%;" src="http://47.109.93.230:9000/cloud-nas/nofollow.jpg">
-    </div>
-    <div class="post-card" v-for="item in followedBlogList" :key="item.id" v-if="!(allFollowedSet.size === 0)" >
+    <div class="post-card" v-for="item in followedStore.followedBlogList" :key="item.id" v-if="!(allFollowedSet.size === 0)" >
       <!-- 用户信息 -->
       <div class="user-info">
         <el-avatar :src="item.avatar"/>
@@ -105,7 +100,7 @@
     </div>
     <!-- 加载中提示 -->
     <!-- 加载触发器，占位符，用于触发懒加载 -->
-    <div ref="loadMoreRef" v-if="followedStore.hasMore" style="height: 10px;background-color: white"></div>
+    <div ref="followedLoadMoreRef" v-if="followedStore.hasMore" style="height: 10px;background-color: white"></div>
     <div v-loading="followedStore.loading" element-loading-text="加载中..." v-if="followedStore.hasMore" style="height: 100px;width: 100%;background-color: white"></div>
     <div v-if="!followedStore.hasMore" style="display:flex;align-items: center;justify-content: center;height: 60px;background-color: white">没有更多了~</div>
   </div>
@@ -132,7 +127,7 @@ import {memberInfoShare} from "../../../../pinia/member/MemberInfoShare.js";
 import {publisherMemberIdShare} from "../../../../pinia/detail/PublisherMemberIdShare.js";
 import {useBlogDetailStore} from "../../../../pinia/detail/UseBlogDetailStore.js";
 
-const loadMoreRef = ref(null)
+const followedLoadMoreRef = ref(null)
 let observer = null;
 onMounted(() => {
   storeMemberId.value = localStorage.getItem('memberId')
@@ -144,31 +139,36 @@ onMounted(() => {
     router.push("/phoneLogin")
     return;
   }
-  followedStore.fetchAllFollowedIds()
   // 创建 IntersectionObserver（监听元素进入视口）
   observer = new IntersectionObserver((entries) => {
     const entry = entries[0]
     if (entry.isIntersecting) {
-      followedStore.fetchFollowedBlogs();
+      if (followedStore.currentPage === 1) {
+        followedStore.fetchAllFollowedIds();
+      } else {
+        followedStore.fetchFollowedBlogs();
+      }
     }
   })
 
   // 开始监听那个 div（只要它出现在屏幕里就触发加载）
-  if (loadMoreRef.value) {
-    observer.observe(loadMoreRef.value)
+  if (followedLoadMoreRef.value) {
+    observer.observe(followedLoadMoreRef.value)
   }
 })
 onBeforeUnmount(() => {
   // 页面销毁前停止监听
-  if (loadMoreRef.value && observer) {
-    observer.unobserve(loadMoreRef.value)
+  if (followedLoadMoreRef.value && observer) {
+    observer.unobserve(followedLoadMoreRef.value)
   }
+  followedStore.reset()
+  console.log("follow" + followedStore.hasMore)
 })
 
 const router = useRouter();
 const followedStore = followedMembersStore()
 const memberStore = memberInfoShare()
-const {loading,followedBlogList,allFollowedIds} = storeToRefs(followedStore)
+const {loading,allFollowedIds} = storeToRefs(followedStore)
 const storeMemberId = ref()
 const allFollowedSet = computed(() => new Set(allFollowedIds.value))
 const publisherIdStore = publisherMemberIdShare()

@@ -28,5 +28,6 @@ export const memberEditBlogShare = defineStore('memberEditBlog', () => {
 
     return {
         memberEditBlog,
+        reset
     }
 })

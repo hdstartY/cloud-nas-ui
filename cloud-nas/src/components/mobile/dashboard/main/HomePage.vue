@@ -174,10 +174,14 @@ onMounted(() => {
   // restoreScrollPosition()
 
 })
+const isToBlogDetail = ref(false)
 onBeforeUnmount(() => {
   // 页面销毁前停止监听
   if (loadMoreRef.value && observer) {
     observer.unobserve(loadMoreRef.value)
+  }
+  if (!blogStore.isTOBlogDetail) {
+    blogStore.reset()
   }
 })
 // // 保存滚动位置
@@ -526,6 +530,7 @@ import {useBlogDetailStore} from "../../../../pinia/detail/UseBlogDetailStore.js
 import {debounce} from "lodash";
 const blogDetailStore = useBlogDetailStore()
 const toBlogDetailPage = (item) => {
+  blogStore.isTOBlogDetail = true;
   blogDetailStore.blogDetail = item
   router.push("/mobileDashboard/homeBlogDetail")
 }

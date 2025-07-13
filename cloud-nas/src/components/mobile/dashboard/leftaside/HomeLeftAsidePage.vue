@@ -20,7 +20,7 @@
 <script setup>
 import {Histogram, Operation, Refresh, TrendCharts} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
-import {ref} from "vue";
+import {onBeforeUnmount, ref} from "vue";
 import {homeBlogStore} from "../../../../pinia/honeBlog/HomeBlogShared.js";
 
 const router = useRouter();
@@ -28,17 +28,23 @@ const blogStore = homeBlogStore()
 
 const selectItemNum = ref(1)
 const toRecommend = () => {
+  blogStore.blogList = []
   blogStore.selectItem = 1;
   blogStore.sortField = 'default'
-  router.push("/mobileDashboard/home")
+  blogStore.loading = true;
+  blogStore.hasMore = true;
 }
 const toNew = () => {
+  blogStore.blogList = []
   blogStore.sortField = 'b.create_time'
   blogStore.selectItem = 2
+  blogStore.loading = true;
+  blogStore.hasMore = true;
 }
 const toCategory = () => {
   blogStore.selectItem = 3
 }
+
 </script>
 
 <style scoped>

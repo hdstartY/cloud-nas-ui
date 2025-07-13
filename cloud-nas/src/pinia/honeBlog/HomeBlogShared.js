@@ -43,7 +43,6 @@ export const homeBlogStore = defineStore('blog', () => {
 
     const isCover = ref(false);
     async function fetchBlogs() {
-        loading.value = true;
         // 请求
         try {
             const response = await mRequest.get("/blog/getBlogVosByCache",{
@@ -79,7 +78,6 @@ export const homeBlogStore = defineStore('blog', () => {
     const sortCurrentPage = ref(1);
     const sortField = ref('default') // 默认排序
     async function fetchBlogsBySort() {
-        loading.value = true;
         // 请求
         try {
             const response = await mRequest.get("/blog/list",{
@@ -114,12 +112,13 @@ export const homeBlogStore = defineStore('blog', () => {
         }
     }
 
+    const isTOBlogDetail = ref(false)
     function reset() {
         sortField.value = 'default'
         blogList.value = []
         loading.value = true
-        currentPage.value = 1;
         hasMore.value = true;
+        selectItem.value = 1;
     }
 
     // 监听排序字段变化，自动请求数据
@@ -143,11 +142,11 @@ export const homeBlogStore = defineStore('blog', () => {
         selectItem,
         fetchBlogsBySort,
         currentPage,
-        sortCurrentPage
+        sortCurrentPage,
+        isTOBlogDetail
     }
 
 
 
 },{
-
 })

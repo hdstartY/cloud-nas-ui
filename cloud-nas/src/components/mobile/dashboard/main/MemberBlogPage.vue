@@ -173,6 +173,7 @@ onBeforeUnmount(() => {
   if (loadMoreRef.value && observer) {
     observer.unobserve(loadMoreRef.value)
   }
+  memberBlogStore.reset()
 })
 
 const changeBlogStatus = (item) => {

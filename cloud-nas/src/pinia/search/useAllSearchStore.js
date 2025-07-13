@@ -2,24 +2,25 @@
 import { defineStore } from 'pinia'
 import {computed, ref, watch} from 'vue'
 import mRequest from "../../utils/MemberRequest.js";
+import {useBlogSearchStore} from "./useBlogSearchStore.js";
 
 
-export const useBlogSearchStore = defineStore('useBlogSearchStore', () => {
+export const useAllSearchStore = defineStore('useAllSearchStore', () => {
 
     const searchBlogList = ref([])
 
-    const searchValue = ref('');
+    const blogSearchStore = useBlogSearchStore()
     const currentPage = ref(1)
     const pageSize = ref(20)
     const loading = ref(true)
     const hasMore = ref(true)
-    const getBLogsBySearch = async () => {
+    const getAllBySearch = async () => {
         try {
-            const response = await mRequest.get("blog/searchBlogByES",{
+            const response = await mRequest.get("blog/searchAllByES",{
                 params: {
                     currentPage: currentPage.value,
                     pageSize: pageSize.value,
-                    searchValue: searchValue.value,
+                    searchValue: blogSearchStore.searchValue,
                 }
             })
             if (response.data.code === 200) {
@@ -52,7 +53,6 @@ export const useBlogSearchStore = defineStore('useBlogSearchStore', () => {
         loading.value = true;
         hasMore.value = true;
         currentPage.value = 1;
-        searchValue.value = ''
     }
 
 
@@ -63,8 +63,7 @@ export const useBlogSearchStore = defineStore('useBlogSearchStore', () => {
         loading,
         currentPage,
         pageSize,
-        searchValue,
-        getBLogsBySearch,
+        getAllBySearch,
         reset
     }
 },{

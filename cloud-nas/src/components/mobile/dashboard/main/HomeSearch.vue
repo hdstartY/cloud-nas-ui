@@ -13,8 +13,9 @@
           class="custom-tabs"
           @tab-click="handleClick"
       >
-        <el-tab-pane label="博客" name="1">博客内容</el-tab-pane>
-        <el-tab-pane label="用户" name="2">用户内容</el-tab-pane>
+        <el-tab-pane label="综合" name="all">综合内容</el-tab-pane>
+        <el-tab-pane label="博客" name="blog">博客内容</el-tab-pane>
+        <el-tab-pane label="用户" name="user">用户内容</el-tab-pane>
       </el-tabs>
     </div>
 <!--    内容-->
@@ -33,19 +34,36 @@ import {useBlogSearchStore} from "../../../../pinia/search/useBlogSearchStore.js
 import {useRouter} from "vue-router";
 import {useMemberSearchStore} from "../../../../pinia/search/useMemberSearchStore.js";
 
-const activeName = ref('1')
+const activeName = ref('all')
 const blogSearchStore = useBlogSearchStore()
 const memberSearchStore = useMemberSearchStore()
 const router = useRouter()
 
-const handleClick = () => {
-  if (activeName.value === '1') {
-    router.push("/mobileDashboard/homeSearch/searchMember")
+const test01 = () => {
+  alert("1")
+}
+
+const handleClick = (tabPane) => {
+  activeName.value = tabPane.props.name
+  if (activeName.value === 'all') {
+    router.push("/mobileDashboard/homeSearch/searchAll")
   }
-  if (activeName.value === '2') {
+  if (activeName.value === 'blog') {
     router.push("/mobileDashboard/homeSearch/searchBlog")
   }
+  if (activeName.value === 'user') {
+    router.push("/mobileDashboard/homeSearch/searchMember")
+  }
 }
+// const handleClick = () => {
+//   console.log(activeName.value)
+//   if (activeName.value === '1') {
+//     router.push("/mobileDashboard/homeSearch/searchMember")
+//   }
+//   if (activeName.value === '2') {
+//     router.push("/mobileDashboard/homeSearch/searchBlog")
+//   }
+// }
 const back = () => {
   router.back()
 }
@@ -76,7 +94,7 @@ onBeforeUnmount(() => {
 }
 
 .custom-tabs ::v-deep(.el-tabs__item) {
-  width: 320px !important;
+  width: 213px !important;
   text-align: center;
   margin: 0;
   padding: 0;

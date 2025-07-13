@@ -148,7 +148,9 @@ import {useRouter} from "vue-router";
 import {memberInfoShare} from "../../../pinia/member/MemberInfoShare.js";
 import {followedMembersStore} from "../../../pinia/follow/FollowedMemberIdsShare.js";
 import {useBlogDetailStore} from "../../../pinia/detail/UseBlogDetailStore.js";
+import {homeBlogStore} from "../../../pinia/honeBlog/HomeBlogShared.js";
 
+const blogStore = homeBlogStore()
 const loadMoreRef = ref(null)
 let observer = null;
 onMounted(() => {
@@ -169,6 +171,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  blogStore.isTOBlogDetail = false;
   blogDetailStore.reset()
 })
 
