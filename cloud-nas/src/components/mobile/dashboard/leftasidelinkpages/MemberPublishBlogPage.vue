@@ -24,6 +24,7 @@
           v-model:file-list="fileList"
           :on-change="handChange"
           :multiple="true"
+          accept=".jpg,.jpeg,.png,.mp4,.mov"
           :limit="12"
       >
         <el-icon><Plus /></el-icon>
@@ -63,7 +64,7 @@
     </div>
   </div>
   <div style="text-align: center;margin-top: 20px">
-    <el-button type="success" @click="publish()">发布</el-button>
+    <el-button :disabled="isPublish" type="success" @click="publish()">发布</el-button>
     <el-button type="danger">清空</el-button>
   </div>
 </template>
@@ -95,6 +96,7 @@
     form.memberId = memberStore.memberId
   })
 
+  const isPublish = ref(false)
   const publish = async () => {
     const formData = new FormData()
 
@@ -112,6 +114,7 @@
 
     //发请求
     try {
+      isPublish.value = true;
       const response = await mRequest.post('/blog/publishBlog', formData)
       if (response.data.code === 200) {
         ElMessage({
@@ -121,13 +124,16 @@
         dereactionStore.memberBlogDerection = 1;
         memberBlogStore.reset();
         router.push("/mobileDashboard/memberBlog")
+        isPublish.value = true;
       }else {
         ElMessage({
           type: "error",
           message: response.data.data.msg
         })
+        isPublish.value = false;
       }
     } catch (e) {
+      isPublish.value = false;
       ElMessage({
         type: "error",
         message: "上传失败！"

@@ -27,10 +27,15 @@
 <script setup>
   import {useRouter} from "vue-router";
   import mRequest from "../../../utils/MemberRequest.js";
-  import {reactive} from "vue";
+  import {onMounted, reactive} from "vue";
   import {ElMessage} from "element-plus";
   import {memberInfoShare} from "../../../pinia/member/MemberInfoShare.js";
 
+  onMounted(() => {
+    if (localStorage.hasOwnProperty("m_token")) {
+      router.push("/mobileDashboard")
+    }
+  })
 
   const router = useRouter();
   const memberStore = memberInfoShare();

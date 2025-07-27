@@ -42,15 +42,15 @@ export const useBlogDetailStore = defineStore('useBlogStore', () => {
                 if (response.data.data.length) {
                     if (currentPage.value === 1) {
                         comments.value = response.data.data
-                        if (response.data.data.length < 15) {
-                            hasMore.value = false
-                            commentsLoading.value = false
-                        }
                     } else {
                         comments.value = comments.value.concat(response.data.data)
                     }
                     currentPage.value += 1;
                 } else {
+                    hasMore.value = false
+                    commentsLoading.value = false
+                }
+                if (response.data.data.length < 15) {
                     hasMore.value = false
                     commentsLoading.value = false
                 }

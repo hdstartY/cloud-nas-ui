@@ -46,18 +46,51 @@
           {{blogDetailStore.blogDetail.textContent}}
         </div>
 <!--        媒体信息栏-->
-        <div style="margin: 10px 70px;padding-left: 10px;" class="img-content" v-if="blogDetailStore.blogDetail.images && blogDetailStore.blogDetail.images.length">
-          <el-image
+        <!-- 图片/视频缩略图容器 -->
+        <div style="padding-left: 20px" class="img-content" v-if="blogDetailStore.blogDetail.images && blogDetailStore.blogDetail.images.length">
+          <div
+              class="media-thumb"
               v-for="(img, index) in blogDetailStore.blogDetail.images"
               :key="index"
-              :src="img"
-              class="post-image"
-              fit="cover"
-              :preview-src-list="blogDetailStore.blogDetail.images"
-              :initial-index="index"
-              preview-teleported
-          />
+              @click="handleMediaClick(img)"
+          >
+            <template v-if="img.isVideo === 0">
+              <!-- 普通图片，点击预览 -->
+              <el-image
+                  :src="img.preUrl"
+                  class="post-image"
+                  fit="cover"
+                  :preview-src-list="[img.oriUrl]"
+                  :initial-index="index"
+                  preview-teleported
+              />
+            </template>
+            <template v-else>
+              <!-- 视频缩略图：点击后弹窗播放 -->
+              <img :src="img.preUrl" class="post-image video-thumb" />
+              <span class="video-icon">▶</span>
+            </template>
+          </div>
         </div>
+
+        <!-- 视频播放弹窗 -->
+        <el-dialog
+            v-model="videoDialogVisible"
+            width="60%"
+            top="10vh"
+            :before-close="handleDialogClose"
+            class="video-dialog"
+            :modal="false"
+            style="box-shadow: none;background-color: rgba(220, 223, 230, 0.64)"
+        >
+          <video
+              v-if="currentVideoUrl"
+              :src="currentVideoUrl"
+              controls
+              autoplay
+              style="width: 100%; max-height: 70vh; background: #000"
+          ></video>
+        </el-dialog>
 <!--        功能栏-->
         <div style="display: flex;flex-direction: row;justify-content: space-between;align-items: center;padding: 0 70px;margin-top: 10px">
           <div class="clickable-text" style="width: 80px;display: flex;align-items: center;justify-content: center">
@@ -149,6 +182,23 @@ import {memberInfoShare} from "../../../pinia/member/MemberInfoShare.js";
 import {followedMembersStore} from "../../../pinia/follow/FollowedMemberIdsShare.js";
 import {useBlogDetailStore} from "../../../pinia/detail/UseBlogDetailStore.js";
 import {homeBlogStore} from "../../../pinia/honeBlog/HomeBlogShared.js";
+
+
+const videoDialogVisible = ref(false)
+const currentVideoUrl = ref('')
+
+function handleMediaClick(img) {
+  if (img.isVideo === 1) {
+    currentVideoUrl.value = img.oriUrl
+    videoDialogVisible.value = true
+  }
+  // 图片自动 preview，不需要手动处理
+}
+
+function handleDialogClose() {
+  videoDialogVisible.value = false
+  currentVideoUrl.value = ''
+}
 
 const blogStore = homeBlogStore()
 const loadMoreRef = ref(null)
@@ -403,7 +453,48 @@ const blogId = ref('')
   height: 120px;
   object-fit: cover;
   border-radius: 6px;
-  margin-right: 5px;
 }
+
+.img-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 640px;
+}
+
+.media-thumb {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  cursor: pointer;
+}
+
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* 视频上的播放图标 */
+.video-thumb {
+  filter: brightness(0.7);
+}
+
+.video-icon {
+  position: absolute;
+  font-size: 28px;
+  color: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* 弹窗样式可定制 */
+.video-dialog .el-dialog__body {
+  padding: 0;
+}
+
 
 </style>

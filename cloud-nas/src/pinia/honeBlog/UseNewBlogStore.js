@@ -4,7 +4,7 @@ import { ref, watch } from 'vue'
 import mRequest from "../../utils/MemberRequest.js";
 import {ElMessage} from "element-plus";
 
-export const homeBlogStore = defineStore('blog', () => {
+export const useNewBlogStore = defineStore('useNewBlogStore', () => {
 
     const currentPage = ref(1);
     const hasMore = ref(true);
@@ -29,12 +29,14 @@ export const homeBlogStore = defineStore('blog', () => {
         // },
     ])
 
-    async function fetchBlogs() {
+    async function fetchBlogsBySort() {
         // 请求
         try {
-            const response = await mRequest.get("/blog/getBlogVosByCache",{
+            const response = await mRequest.get("/blog/list",{
                 params: {
-                    currentPage: currentPage.value
+                    currentPage: currentPage.value,
+                    pageSize: 20,
+                    orderType: 'b.create_time',
                 }
             })
             if (response.data.code === 200) {
@@ -54,7 +56,6 @@ export const homeBlogStore = defineStore('blog', () => {
                         hasMore.value = false;
                     }
                 }
-
             } else {
                 console.log(response.data.msg)
             }
@@ -65,7 +66,6 @@ export const homeBlogStore = defineStore('blog', () => {
             })
         }
     }
-
 
     const isTOBlogDetail = ref(false)
     function reset() {
@@ -79,7 +79,7 @@ export const homeBlogStore = defineStore('blog', () => {
         hasMore,
         loading,
         reset,
-        fetchBlogs,
+        fetchBlogsBySort,
         currentPage,
         isTOBlogDetail
     }

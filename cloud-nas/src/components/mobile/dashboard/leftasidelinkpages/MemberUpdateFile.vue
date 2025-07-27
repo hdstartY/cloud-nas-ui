@@ -2,9 +2,9 @@
 <!--  总块-->
   <div style="width: 100%">
 <!--    头顶导航-->
-    <div style="width: 100%;height: 50px;background-color: skyblue;display: flex">
+    <div style="width: 100%;height: 50px;display: flex;border-bottom: rgba(220, 223, 230, 0.64) 1px solid">
 <!--      展示-->
-      <div style="width: 340px;height: 100%;background-color:gray ;display: flex;align-items: center;justify-content: center;font-size: 20px">
+      <div style="width: 340px;height: 100%;display: flex;border-right: rgba(220, 223, 230, 0.64) 1px solid;align-items: center;justify-content: center;font-size: 20px">
         我的
       </div>
 <!--      发布-->

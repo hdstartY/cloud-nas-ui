@@ -137,4 +137,6 @@ export const followedMembersStore = defineStore('followed', () => {
         fetchFollowedBlogs,
         fetchAllFollowedIds,
     }
+},{
+    persist: true
 })

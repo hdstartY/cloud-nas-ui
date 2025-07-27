@@ -46,6 +46,7 @@ import HomeSearch from "../components/mobile/dashboard/main/HomeSearch.vue"
 import SearchBlogDetail from "../components/mobile/detail/SearchBlogDetail.vue"
 import SearchMemberDetail from "../components/mobile/detail/SearchMemberDetail.vue"
 import SearchAllDetail from "../components/mobile/detail/SearchAllDetail.vue"
+import NewHomePage from "../components/mobile/dashboard/main/NewHomePage.vue"
 
 const routes = [
 
@@ -87,6 +88,11 @@ const routes = [
       {path: 'home', components: {
         left: HomeLeftAsidePage,
         main: HomePage,
+        right: HomeRightAside,
+        }},
+      {path: 'newHome', components: {
+        left: HomeLeftAsidePage,
+        main: NewHomePage,
         right: HomeRightAside,
         }},
       {path: 'memberBlog', components: {

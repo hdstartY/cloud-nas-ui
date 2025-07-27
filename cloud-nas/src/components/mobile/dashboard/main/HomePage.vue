@@ -26,25 +26,59 @@
       </div>
 
       <!-- 图片内容 -->
+      <!-- 图片/视频缩略图容器 -->
       <div class="img-content" v-if="item.images && item.images.length">
-        <el-image
+        <div
+            class="media-thumb"
             v-for="(img, index) in item.images"
             :key="index"
-            :src="img"
-            class="post-image"
-            fit="cover"
-            :preview-src-list="item.images"
-            :initial-index="index"
-            preview-teleported
-        />
+            @click="handleMediaClick(img)"
+        >
+          <template v-if="img.isVideo === 0">
+            <!-- 普通图片，点击预览 -->
+            <el-image
+                :src="img.preUrl"
+                class="post-image"
+                fit="cover"
+                :preview-src-list="[img.oriUrl]"
+                :initial-index="index"
+                preview-teleported
+            />
+          </template>
+          <template v-else>
+            <!-- 视频缩略图：点击后弹窗播放 -->
+            <img :src="img.preUrl" class="post-image video-thumb" />
+            <span class="video-icon">▶</span>
+          </template>
+        </div>
       </div>
+
+      <!-- 视频播放弹窗 -->
+      <el-dialog
+          v-model="videoDialogVisible"
+          width="60%"
+          top="10vh"
+          :before-close="handleDialogClose"
+          class="video-dialog"
+          :modal="false"
+          style="box-shadow: none;background-color: rgba(220, 223, 230, 0.64)"
+      >
+        <video
+            v-if="currentVideoUrl"
+            :src="currentVideoUrl"
+            controls
+            autoplay
+            style="width: 100%; max-height: 70vh; background: #000"
+        ></video>
+      </el-dialog>
+
 
       <!-- 点赞评论等 -->
       <div class="action-bar" style="align-items: center">
         <div @click="toLike(item)" class="clickable-text" :class="{'clickable-text-selected':item.isLike}" style="width: 80px;display: flex;justify-content: center;align-items: center">
           <el-icon><Star /></el-icon>点赞 {{item.likeNum}}
         </div>
-        <div class="clickable-text" style="width: 80px;display: flex;justify-content: center;align-items: center" @click="item.isShowComment = !item.isShowComment" :class="{'clickable-text-selected':item.isShowComment}">
+        <div class="clickable-text" style="width: 80px;display: flex;justify-content: center;align-items: center" @click="getComments(item)" :class="{'clickable-text-selected':item.isShowComment}">
           <el-icon><chat-round/></el-icon>评论 {{item.commentNum}}
         </div>
         <div >
@@ -80,11 +114,12 @@
               <el-button @click="publishComment(item)" type="primary" round>评论</el-button>
             </div>
           </div>
-          <!--        评论内容-->
+          <div style="min-height: 134px" v-loading="item.commentLoading">
+            <!--        评论内容-->
             <div style="margin-top: 10px;">
               <span style="margin-right: 20px" @click="isClicked = isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':isClicked}" class="clickable-text">按热度</span><span @click="isClicked = !isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':!isClicked}" class="clickable-text">按时间</span>
             </div>
-            <div style="height: 50px;width: 626px;text-align: center;margin-top: 20px;" v-if="item.comments.length === 0">
+            <div style="height: 50px;width: 626px;text-align: center;margin-top: 20px;" v-if="item.comments.length === 0 && !item.commentLoading">
               评论区空空如也，去发表你的评论吧~
             </div>
             <div v-if="item.comments.length > 0" v-for="comment in item.comments" :key="comment.id">
@@ -101,9 +136,10 @@
                 </div>
               </div>
             </div>
-            <div @click="toBlogDetailPage(item)" class="clickable-text" style="text-align: center;width: 626px;height: 24px;margin-bottom: 5px;margin-top: 15px" v-if="item.comments.length > 0">
-              查看详情及全部评论<el-icon><arrow-right /></el-icon>
+            <div v-if="!item.commentLoading" @click="toBlogDetailPage(item)" class="clickable-text" style="display: flex;align-items: center;justify-content: center;width: 626px;height: 24px;margin-bottom: 5px;margin-top: 15px">
+              查看详情<el-icon><arrow-right /></el-icon>
             </div>
+          </div>
         </div>
     </div>
 
@@ -142,13 +178,31 @@ import {memberEditBlogShare} from "../../../../pinia/member/MemberEditBlogShare.
 import {useHomeScrollStore} from "../../../../pinia/scroll/UseHomeScrollStore.js";
 import 'element-plus/es/components/collapse-transition/style/css'
 
+const videoVisible = ref(false)
+const videos = ref([])
+const playVideo = (urls) => {
+  videos.value = urls;
+  videoVisible.value = true;
+}
+
+const videoDialogVisible = ref(false)
+const currentVideoUrl = ref('')
+
+function handleMediaClick(img) {
+  if (img.isVideo === 1) {
+    currentVideoUrl.value = img.oriUrl
+    videoDialogVisible.value = true
+  }
+  // 图片自动 preview，不需要手动处理
+}
+
+function handleDialogClose() {
+  videoDialogVisible.value = false
+  currentVideoUrl.value = ''
+}
+
 const loadMoreRef = ref(null)
 let observer = null;
-const scrollContainer = ref(null)
-const homeScrollStore = useHomeScrollStore()
-const route = useRoute()
-const itemRefs = ref([]);
-const visibleSet = reactive(new Set());
 onMounted(() => {
   storeMemberId.value = memberStore.memberId
   if (memberStore.memberId !== '') {
@@ -159,11 +213,7 @@ onMounted(() => {
   observer = new IntersectionObserver((entries) => {
     const entry = entries[0]
     if (entry.isIntersecting) {
-      if (blogStore.sortField === 'default') {
         blogStore.fetchBlogs()
-      } else {
-        blogStore.fetchBlogsBySort()
-      }
     }
   })
 
@@ -174,6 +224,34 @@ onMounted(() => {
   // restoreScrollPosition()
 
 })
+const getComments = async (item) => {
+  item.isShowComment = !item.isShowComment;
+  if (item.isShowComment === false) {
+    item.commentLoading = true;
+    item.comments = [];
+    return;
+  }
+  try {
+    const response = await mRequest.get("/comment/listByBlogId",{
+      params: {
+        id: item.id
+      }
+    })
+    if (response.data.code === 200) {
+      item.comments = response.data.data
+      item.commentLoading = false;
+    } else {
+      console.log(response.data.msg)
+      item.commentLoading = false;
+    }
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: error.message
+    })
+    item.commentLoading = false;
+  }
+}
 const isToBlogDetail = ref(false)
 onBeforeUnmount(() => {
   // 页面销毁前停止监听
@@ -183,6 +261,7 @@ onBeforeUnmount(() => {
   if (!blogStore.isTOBlogDetail) {
     blogStore.reset()
   }
+  followedStore.reset()
 })
 // // 保存滚动位置
 // const handleScroll = debounce(() => {
@@ -609,15 +688,16 @@ const toBlogDetailPage = (item) => {
 }
 
 .img-content {
-  gap: 10px;
-  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 640px;
 }
 .post-image {
   width: 120px;
   height: 120px;
   object-fit: cover;
   border-radius: 6px;
-  margin-right: 5px;
 }
 
 .action-bar {
@@ -628,6 +708,55 @@ const toBlogDetailPage = (item) => {
   flex-direction: row;
   gap: 10px;
   justify-content: space-between;
+}
+.play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  color: white;
+  text-shadow: 0 0 5px black;
+}
+.img-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 640px;
+}
+
+.media-thumb {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  cursor: pointer;
+}
+
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* 视频上的播放图标 */
+.video-thumb {
+  filter: brightness(0.7);
+}
+
+.video-icon {
+  position: absolute;
+  font-size: 28px;
+  color: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* 弹窗样式可定制 */
+.video-dialog .el-dialog__body {
+  padding: 0;
 }
 
 </style>

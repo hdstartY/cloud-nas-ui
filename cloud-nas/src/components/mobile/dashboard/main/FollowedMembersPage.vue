@@ -9,7 +9,7 @@
           <div style="font-size: 12px;color: rgb(147,147,147)">{{ item.createTime }}</div>
         </div>
         <el-button v-if="!(allFollowedSet.has(item.memberId))" @click="toFollow(item.memberId)" type="success" plain round style="width: 60px;margin-left: 80px" ><el-icon><plus/></el-icon>关注</el-button>
-        <el-button v-if="(allFollowedSet.has(item.memberId))" @click="toCancelFollow(item.memberId)" type="warning" plain round style="width: 60px;margin-left: 80px" ><el-icon><check/></el-icon>已关注</el-button>
+        <el-button v-if="(allFollowedSet.has(item.memberId))" @click="toCancelFollow(item.memberId,item.nickName)" type="warning" plain round style="width: 60px;margin-left: 80px" ><el-icon><check/></el-icon>已关注</el-button>
       </div>
 
       <!-- 文字内容 -->
@@ -18,25 +18,58 @@
       </div>
 
       <!-- 图片内容 -->
+      <!-- 图片/视频缩略图容器 -->
       <div class="img-content" v-if="item.images && item.images.length">
-        <el-image
+        <div
+            class="media-thumb"
             v-for="(img, index) in item.images"
             :key="index"
-            :src="img"
-            class="post-image"
-            fit="cover"
-            :preview-src-list="item.images"
-            :initial-index="index"
-            preview-teleported
-        />
+            @click="handleMediaClick(img)"
+        >
+          <template v-if="img.isVideo === 0">
+            <!-- 普通图片，点击预览 -->
+            <el-image
+                :src="img.preUrl"
+                class="post-image"
+                fit="cover"
+                :preview-src-list="[img.oriUrl]"
+                :initial-index="index"
+                preview-teleported
+            />
+          </template>
+          <template v-else>
+            <!-- 视频缩略图：点击后弹窗播放 -->
+            <img :src="img.preUrl" class="post-image video-thumb" />
+            <span class="video-icon">▶</span>
+          </template>
+        </div>
       </div>
+
+      <!-- 视频播放弹窗 -->
+      <el-dialog
+          v-model="videoDialogVisible"
+          width="60%"
+          top="10vh"
+          :before-close="handleDialogClose"
+          class="video-dialog"
+          :modal="false"
+          style="box-shadow: none;background-color: rgba(220, 223, 230, 0.64)"
+      >
+        <video
+            v-if="currentVideoUrl"
+            :src="currentVideoUrl"
+            controls
+            autoplay
+            style="width: 100%; max-height: 70vh; background: #000"
+        ></video>
+      </el-dialog>
 
       <!-- 点赞评论等 -->
       <div class="action-bar" style="align-items: center">
         <div class="clickable-text" style="width: 80px;display: flex;align-items: center;justify-content: center">
           <el-icon><Star/></el-icon>点赞 {{item.likeNum}}
         </div>
-        <div class="clickable-text" style="width: 80px;display: flex;align-items: center;justify-content: center" @click="item.isShowComment = !item.isShowComment" :class="{'clickable-text-selected':item.isShowComment}">
+        <div class="clickable-text" style="width: 80px;display: flex;align-items: center;justify-content: center" @click="getComments(item)" :class="{'clickable-text-selected':item.isShowComment}">
           <el-icon><chat-round/></el-icon>评论 {{item.commentNum}}
         </div>
         <div>
@@ -72,29 +105,31 @@
             <el-button @click="publishComment(item)" type="primary" round>评论</el-button>
           </div>
         </div>
-        <!--        评论内容-->
-        <div style="margin-top: 10px;">
-          <span style="margin-right: 20px" @click="isClicked = isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':isClicked}" class="clickable-text">按热度</span><span @click="isClicked = !isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':!isClicked}" class="clickable-text">按时间</span>
-        </div>
-        <div style="height: 50px;width: 626px;text-align: center;margin-top: 20px;" v-if="item.comments.length === 0">
-          评论区空空如也，去发表你的评论吧~
-        </div>
-        <div v-if="item.comments.length > 0" v-for="comment in item.comments" :key="comment.id">
-          <div>
-            <div style="margin-top: 10px;display:flex;flex-direction: row">
-              <el-avatar v-if="comment.avatar" :src="comment.avatar" style="font-size: 20px;width: 30px;height: 30px"  class="avatar"/>
-              <div style="margin-left: 5px;width: 420px">
-                <div style="font-size: 13px;font-weight: 500;color: rgb(64, 158, 255)" class="clickable-text" @click="reply(comment,item)">{{ comment.commentNickName }}</div>
-                <div style="font-size: 12px;color: rgb(147,147,147)">{{ comment.createTime }}</div>
+        <div style="min-height: 134px" v-loading="item.commentLoading">
+          <!--        评论内容-->
+          <div style="margin-top: 10px;">
+            <span style="margin-right: 20px" @click="isClicked = isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':isClicked}" class="clickable-text">按热度</span><span @click="isClicked = !isClicked ? isClicked : !isClicked" :class="{'clickable-text-selected':!isClicked}" class="clickable-text">按时间</span>
+          </div>
+          <div style="height: 50px;width: 626px;text-align: center;margin-top: 20px;" v-if="item.comments.length === 0 && !item.commentLoading">
+            评论区空空如也，去发表你的评论吧~
+          </div>
+          <div v-if="item.comments.length > 0" v-for="comment in item.comments" :key="comment.id">
+            <div>
+              <div style="margin-top: 10px;display:flex;flex-direction: row">
+                <el-avatar @click="toComPublisherDetail(comment)" v-if="comment.avatar" :src="comment.avatar" style="font-size: 20px;width: 30px;height: 30px"  class="avatar"/>
+                <div style="margin-left: 5px;width: 420px">
+                  <div style="font-size: 13px;font-weight: 500;color: rgb(64, 158, 255)" class="clickable-text" @click="reply(comment,item)">{{ comment.commentNickName }}</div>
+                  <div style="font-size: 12px;color: rgb(147,147,147)">{{ comment.createTime }}</div>
+                </div>
+              </div>
+              <div style="font-size: 13px;margin-left: 35px;margin-top: 5px">
+                {{comment.textContent}}
               </div>
             </div>
-            <div style="font-size: 13px;margin-left: 35px;margin-top: 5px">
-              {{comment.textContent}}
-            </div>
           </div>
-        </div>
-        <div @click="toBlogDetailPage(item)" class="clickable-text" style="text-align: center;width: 626px;height: 24px;margin-bottom: 5px;margin-top: 15px" v-if="item.comments.length > 0">
-          查看详情及全部评论<el-icon><arrow-right /></el-icon>
+          <div v-if="!item.commentLoading" @click="toBlogDetailPage(item)" class="clickable-text" style="display: flex;align-items: center;justify-content: center;width: 626px;height: 24px;margin-bottom: 5px;margin-top: 15px">
+            查看详情<el-icon><arrow-right /></el-icon>
+          </div>
         </div>
       </div>
     </div>
@@ -119,7 +154,7 @@ import {
 } from "@element-plus/icons-vue";
 import {computed, onBeforeUnmount, onMounted, onUnmounted, reactive, ref,} from "vue";
 import mRequest from "../../../../utils/MemberRequest.js";
-import {ElMessage} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
 import {followedMembersStore} from "../../../../pinia/follow/FollowedMemberIdsShare.js";
@@ -127,10 +162,26 @@ import {memberInfoShare} from "../../../../pinia/member/MemberInfoShare.js";
 import {publisherMemberIdShare} from "../../../../pinia/detail/PublisherMemberIdShare.js";
 import {useBlogDetailStore} from "../../../../pinia/detail/UseBlogDetailStore.js";
 
+
+const videoDialogVisible = ref(false)
+const currentVideoUrl = ref('')
+
+function handleMediaClick(img) {
+  if (img.isVideo === 1) {
+    currentVideoUrl.value = img.oriUrl
+    videoDialogVisible.value = true
+  }
+  // 图片自动 preview，不需要手动处理
+}
+
+function handleDialogClose() {
+  videoDialogVisible.value = false
+  currentVideoUrl.value = ''
+}
+
 const followedLoadMoreRef = ref(null)
 let observer = null;
 onMounted(() => {
-  storeMemberId.value = localStorage.getItem('memberId')
   if (memberStore.memberId === '') {
     ElMessage({
       type: 'warning',
@@ -165,11 +216,39 @@ onBeforeUnmount(() => {
   console.log("follow" + followedStore.hasMore)
 })
 
+const getComments = async (item) => {
+  item.comments = []
+  item.isShowComment = !item.isShowComment;
+  if (item.isShowComment === false) {
+    item.commentLoading = true;
+    return;
+  }
+  try {
+    const response = await mRequest.get("/comment/listByBlogId",{
+      params: {
+        id: item.id
+      }
+    })
+    if (response.data.code === 200) {
+      item.comments = response.data.data
+      item.commentLoading = false;
+    } else {
+      console.log(response.data.msg)
+      item.commentLoading = false;
+    }
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: error.message
+    })
+    item.commentLoading = false;
+  }
+}
+
 const router = useRouter();
 const followedStore = followedMembersStore()
 const memberStore = memberInfoShare()
 const {loading,allFollowedIds} = storeToRefs(followedStore)
-const storeMemberId = ref()
 const allFollowedSet = computed(() => new Set(allFollowedIds.value))
 const publisherIdStore = publisherMemberIdShare()
 
@@ -211,7 +290,7 @@ const toFollow = async (memberId) => {
     const response = await mRequest.get("/follow/toFollow", {
       params: {
         followedId: memberId,
-        followerId: storeMemberId.value
+        followerId: memberStore.memberId
       }
     })
     if (response.data.code === 200) {
@@ -234,33 +313,46 @@ const toFollow = async (memberId) => {
     console.log(e.message)
   }
 }
-const toCancelFollow = async (memberId) => {
-  try {
-    const response = await mRequest.get("/follow/toCancelFollow", {
-      params: {
-        followedId: memberId,
-        followerId: storeMemberId.value
+const toCancelFollow = async (memberId,nickName) => {
+  ElMessageBox.confirm(
+      `确认取消关注${nickName}吗？`,
+      '温馨提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
       }
-    })
-    if (response.data.code === 200) {
-      allFollowedIds.value = allFollowedIds.value.filter(id => id !== memberId)
-      ElMessage({
-        type: 'success',
-        message: '取消关注成功'
+  ).then( async () => {
+
+    try {
+      const response = await mRequest.get("/follow/toCancelFollow", {
+        params: {
+          followedId: memberId,
+          followerId: memberStore.memberId
+        }
       })
-    } else {
+      if (response.data.code === 200) {
+        allFollowedIds.value = allFollowedIds.value.filter(id => id !== memberId)
+        ElMessage({
+          type: 'success',
+          message: '取消关注成功'
+        })
+      } else {
+        ElMessage({
+          type: "warning",
+          message: "取消关注失败"
+        })
+      }
+    } catch (e) {
       ElMessage({
-        type: "warning",
-        message: "取消关注失败"
+        type: "error",
+        message: "未知错误"
       })
+      console.log(e.message)
     }
-  } catch (e) {
-    ElMessage({
-      type: "error",
-      message: "未知错误"
-    })
-    console.log(e.message)
-  }
+  }).catch(() => {
+    // 用户点击了“取消”或关闭了对话框
+  })
 }
 
 const reply = (comment, item) => {
@@ -443,8 +535,11 @@ const toBlogDetailPage = (item) => {
 }
 
 .img-content {
-  gap: 10px;
+  gap: 5px;
   margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .post-image {
@@ -452,7 +547,6 @@ const toBlogDetailPage = (item) => {
   height: 120px;
   object-fit: cover;
   border-radius: 6px;
-  margin-right: 5px;
 }
 
 .action-bar {
@@ -464,4 +558,45 @@ const toBlogDetailPage = (item) => {
   gap: 10px;
   justify-content: space-between;
 }
+
+.img-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 640px;
+}
+
+.media-thumb {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  cursor: pointer;
+}
+
+.post-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* 视频上的播放图标 */
+.video-thumb {
+  filter: brightness(0.7);
+}
+
+.video-icon {
+  position: absolute;
+  font-size: 28px;
+  color: white;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.video-dialog .el-dialog__body {
+  padding-top: 0px;
+}
+
 </style>

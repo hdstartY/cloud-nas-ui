@@ -11,7 +11,7 @@
       <div class="header-nav">
 <!--      搜索框-->
         <div style="width: 200px;padding: 10px 0px">
-          <el-input :suffix-icon="Search" v-model="blogSearchStore.searchValue" @keyup.enter="toFind()" style="width: 200px;height: 40px" placeholder="搜索" />
+          <el-input :suffix-icon="Search" v-model="searchValue" @keyup.enter="toFind()" style="width: 200px;height: 40px" placeholder="搜索" />
         </div>
 <!--       导航-->
         <div class="nav-main">
@@ -19,7 +19,7 @@
           <el-tooltip content="关注" effect="light"><div class="main-nav nav-follow box" :class="{'text-selected':boxSelect === 2}" @click="toFollowedMembersPage()" ><el-icon style="font-size: 25px"><star/></el-icon></div></el-tooltip>
           <el-tooltip content="我的" effect="light"><div class="main-nav nav-own box" :class="{'text-selected':boxSelect === 3}" @click="toMemberBlog()" ><el-icon style="font-size: 25px"><user-filled /></el-icon></div></el-tooltip>
           <el-tooltip content="信息" effect="light">
-            <div  style="width: 136px;display: flex;justify-content: center;padding-top: 18px" class="msgbox" :class="{'text-selected':boxSelect === 4}" @click="toMemberMessagePage()">
+            <div  style="width: 136px;display: flex;justify-content: center;padding-top: 19px" class="msgbox" :class="{'text-selected':boxSelect === 4}" @click="toMemberMessagePage()">
               <el-badge :value="messageOPStore.newsNums" class="mark" :max="99" :show-zero="false">
                 <el-icon style="font-size: 25px">
                   <message />
@@ -135,6 +135,9 @@ onMounted (() => {
   }
 })
 
+import {useHomeSearchStore} from "../../pinia/search/useHomeSearchStore.js";
+const homeSearchStore = useHomeSearchStore()
+const searchValue = ref('')
 const toFind = () => {
   if (blogSearchStore.searchValue === '') {
     ElMessage({
@@ -143,7 +146,8 @@ const toFind = () => {
     })
     return;
   }
-  blogSearchStore.currentPage = 1;
+  homeSearchStore.homeSearchValue = searchValue.value
+  searchValue.value = ''
   router.push("/mobileDashboard/homeSearch")
 }
 
@@ -164,6 +168,7 @@ const logout = () => {
     message: "退出登录成功",
   })
   resetTool.reset()
+
 
   router.push("/")
 }

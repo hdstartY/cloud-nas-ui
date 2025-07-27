@@ -6,7 +6,7 @@ import {useResetTool} from "../pinia/UseResetTool.js";
 
 const instance = axios.create({
     baseURL: '/memberapi/', //  API 地址
-    timeout: 10000,
+    timeout: 10000 * 3,
 });
 
 

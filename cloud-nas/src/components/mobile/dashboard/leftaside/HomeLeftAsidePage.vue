@@ -5,13 +5,13 @@
       首页
     </div>
 <!--    切换按钮-->
-    <div @click="toRecommend()" class="box2" :class="{'text-selected':blogStore.selectItem ===1}" style="font-size: 20px;display: flex;flex-direction: row;margin-top: 30px;padding-left: 20px">
+    <div @click="toRecommend()" class="box2" :class="{'text-selected':selectItem ===1}" style="font-size: 20px;display: flex;flex-direction: row;margin-top: 30px;padding-left: 20px">
       <div style="display: flex;align-items: center"><el-icon><histogram /></el-icon></div>推荐
     </div>
-    <div @click="toNew()" class="box2" :class="{'text-selected':blogStore.selectItem ===2}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
+    <div @click="toNew()" class="box2" :class="{'text-selected':selectItem ===2}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
       <div style="display: flex;align-items: center"><el-icon><refresh /></el-icon></div>最新
     </div>
-    <div @click="toCategory()" class="box2" :class="{'text-selected':blogStore.selectItem ===3}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
+    <div @click="toCategory()" class="box2" :class="{'text-selected':selectItem ===3}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
       <div style="display: flex;align-items: center"><el-icon><Operation /></el-icon></div>分类
     </div>
   </div>
@@ -23,26 +23,22 @@ import {useRouter} from "vue-router";
 import {onBeforeUnmount, ref} from "vue";
 import {homeBlogStore} from "../../../../pinia/honeBlog/HomeBlogShared.js";
 
+const selectItem = ref(1)
 const router = useRouter();
 const blogStore = homeBlogStore()
 
-const selectItemNum = ref(1)
 const toRecommend = () => {
   blogStore.blogList = []
-  blogStore.selectItem = 1;
-  blogStore.sortField = 'default'
-  blogStore.loading = true;
-  blogStore.hasMore = true;
+  selectItem.value = 1;
+  router.push("/mobileDashboard/home")
 }
 const toNew = () => {
   blogStore.blogList = []
-  blogStore.sortField = 'b.create_time'
-  blogStore.selectItem = 2
-  blogStore.loading = true;
-  blogStore.hasMore = true;
+  selectItem.value = 2
+  router.push("/mobileDashboard/newHome")
 }
 const toCategory = () => {
-  blogStore.selectItem = 3
+  selectItem.value = 3
 }
 
 </script>

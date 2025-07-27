@@ -103,7 +103,7 @@ export const useChatStore = defineStore('chat', () => {
                             },
                             [
                                 h('span', { style: 'color: orange' }, msgObj.sendNickName + ': '),
-                                h('span', { style: 'color: skyblue' }, msgObj.status === 0?msgObj.message:"图片")
+                                h('span', { style: 'color: lightgreen' }, msgObj.status === 0?msgObj.message:"图片")
                             ]
                         ),
                         showClose: false

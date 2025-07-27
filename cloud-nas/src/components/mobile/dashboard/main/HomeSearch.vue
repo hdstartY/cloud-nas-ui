@@ -3,8 +3,8 @@
 <!--    搜索框返回-->
     <div style="display: flex;padding-left: 20px;height: 50px;justify-content: space-between;padding-right: 20px">
       <div @click="back()" style="display: flex;align-items: center;" class="search-back"><el-icon size="20"><ArrowLeftBold /></el-icon></div>
-      <div style="display: flex;align-items: center;width: 530px"><el-input v-model="blogSearchStore.searchValue" style="width: 100%;height: 40px" placeholder="搜索" /></div>
-      <div style="display: flex;align-items: center;"><el-button style="height: 38px" type="info" plain><el-icon><Search /></el-icon>搜索</el-button></div>
+      <div style="display: flex;align-items: center;width: 530px"><el-input @keyup.enter="toIndex()" v-model="homeSearchStore.homeSearchValue" style="width: 100%;height: 40px" placeholder="搜索" /></div>
+      <div style="display: flex;align-items: center;"><el-button @click="toIndex()" style="height: 38px" type="info" plain><el-icon><Search /></el-icon>搜索</el-button></div>
     </div>
 <!--    类别-->
     <div style="display: flex;justify-content: space-between;padding-left: 20px;padding-right: 20px;margin-top: 20px;">
@@ -29,18 +29,41 @@
 <script setup>
 
 import {ArrowLeftBold, Search} from "@element-plus/icons-vue";
-import {onBeforeMount, onBeforeUnmount, ref} from "vue";
+import {onBeforeMount, onBeforeUnmount, onMounted, ref} from "vue";
 import {useBlogSearchStore} from "../../../../pinia/search/useBlogSearchStore.js";
 import {useRouter} from "vue-router";
 import {useMemberSearchStore} from "../../../../pinia/search/useMemberSearchStore.js";
+import {useAllSearchStore} from "../../../../pinia/search/useAllSearchStore.js";
+import {useHomeSearchStore} from "../../../../pinia/search/useHomeSearchStore.js";
 
+onMounted(()=> {
+
+})
+onBeforeUnmount(() => {
+  homeSearchStore.reset()
+})
+
+const homeSearchStore = useHomeSearchStore()
+const allSearchStore = useAllSearchStore()
 const activeName = ref('all')
 const blogSearchStore = useBlogSearchStore()
 const memberSearchStore = useMemberSearchStore()
 const router = useRouter()
 
-const test01 = () => {
-  alert("1")
+
+const toIndex = () => {
+  if (activeName.value === 'all') {
+    allSearchStore.reset();
+    allSearchStore.getAllBySearch();
+  }
+  if (activeName.value === 'blog') {
+    blogSearchStore.reset();
+    blogSearchStore.getBLogsBySearch();
+  }
+  if (activeName.value === 'user') {
+    memberSearchStore.reset();
+    memberSearchStore.getMembersBySearch()
+  }
 }
 
 const handleClick = (tabPane) => {
@@ -55,15 +78,7 @@ const handleClick = (tabPane) => {
     router.push("/mobileDashboard/homeSearch/searchMember")
   }
 }
-// const handleClick = () => {
-//   console.log(activeName.value)
-//   if (activeName.value === '1') {
-//     router.push("/mobileDashboard/homeSearch/searchMember")
-//   }
-//   if (activeName.value === '2') {
-//     router.push("/mobileDashboard/homeSearch/searchBlog")
-//   }
-// }
+
 const back = () => {
   router.back()
 }

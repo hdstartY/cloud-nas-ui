@@ -8,7 +8,11 @@
       <div style="margin-right: 480px;height: 100%;display: flex;align-items: center;font-size: 20px;"><el-icon><bell /></el-icon> 系统信息 </div>
       <el-badge :value="400" :max="99"/>
     </div>
-
+<!--        互动信息-->
+    <div class="action-message-box">
+      <div style="margin-right: 480px;height: 100%;display: flex;align-items: center;font-size: 20px;"><el-icon><Cellphone /></el-icon> 互动信息 </div>
+      <el-badge :value="400" :max="99"/>
+    </div>
 <!--    私信信息-->
     <div v-if="messageOPStore.pointMessageForm.length > 0" @click="toMessageDetail(item)" class="person-message-box" v-for="item in messageOPStore.pointMessageForm" :key="item.memberId">
       <div style="display: flex;width: 600px">
@@ -20,7 +24,7 @@
 </template>
 
 <script setup>
-import {Bell} from "@element-plus/icons-vue";
+import {Bell, Cellphone} from "@element-plus/icons-vue";
 import {onMounted, ref} from "vue";
 import mRequest from "../../../utils/MemberRequest.js";
 import {memberInfoShare} from "../../../pinia/member/MemberInfoShare.js";
@@ -60,9 +64,9 @@ const toMessageDetail = (item) => {
 
 <style scoped>
 .message-header {
-  margin-bottom: 10px;height: 50px;
+  height: 50px;
   width: 100%;
-  background-color: skyblue;
+  background-color: rgba(220, 223, 230, 0.64);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,14 +77,27 @@ const toMessageDetail = (item) => {
   cursor: pointer;
   height: 60px;
   border-bottom: 1px solid lightgray;
-  border-top: 1px solid lightgray;
   display: flex;
   align-items: center;
   padding-left: 20px;
   padding-right: 20px;
+  background-color: deepskyblue;
 }
 .system-message-box:hover {
-  background-color: lightskyblue;
+  background-color: white;
+}
+.action-message-box {
+  cursor: pointer;
+  height: 60px;
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: pink;
+}
+.action-message-box:hover {
+  background-color: white;
 }
 .message-num-box {
   height: 20px;
@@ -102,7 +119,7 @@ const toMessageDetail = (item) => {
   align-items: center
 }
 .person-message-box:hover {
-  background-color: lightblue;
+  background-color: rgba(220, 223, 230, 0.64);
 }
 .person-avatar-box {
   display: flex;
