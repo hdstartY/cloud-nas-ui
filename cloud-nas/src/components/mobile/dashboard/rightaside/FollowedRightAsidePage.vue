@@ -1,21 +1,21 @@
 <template>
   <div>
     <!--    文字-->
-    <div style="font-size: 30px;padding-left: 20px;margin-top: 10px;">
-      关注
+    <div style="font-size: 25px;padding-left: 20px;margin-top: 10px;display: flex;align-items: center;">
+      <el-icon><DCaret /></el-icon>操作
     </div>
     <!--    切换按钮-->
     <div @click="toNew()" class="box2" :class="{'text-selected':selectItemNum ===1}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px;margin-top: 30px">
-      <div style="display: flex;align-items: center"><el-icon><refresh /></el-icon></div>最新
+      <div style="display: flex;align-items: center;padding-left: 10px"><el-icon><refresh /></el-icon></div>最新
     </div>
     <div @click="toHotPoint()" class="box2" :class="{'text-selected':selectItemNum ===2}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
-      <div style="display: flex;align-items: center"><el-icon><trend-charts /></el-icon></div>热度
+      <div style="display: flex;align-items: center;padding-left: 10px"><el-icon><trend-charts /></el-icon></div>热度
     </div>
   </div>
 </template>
 
 <script setup>
-import {Refresh, TrendCharts} from "@element-plus/icons-vue";
+import {DCaret, Refresh, TrendCharts} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import {followedMembersStore} from "../../../../pinia/follow/FollowedMemberIdsShare.js";
 
@@ -60,11 +60,15 @@ const toHotPoint = () => {
 
 .box2:hover {
   background-color: rgb(208, 237, 250); /* 鼠标移上来时的颜色 */
+  transition: transform 0.3s ease;
+  transform: scale(1.1);
 }
 .box2-selected {
   background-color: skyblue;
 }
 .text-selected {
   color: skyblue;
+  transition: transform 0.3s ease;
+  transform: scale(1.1);
 }
 </style>

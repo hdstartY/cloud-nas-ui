@@ -21,7 +21,6 @@ import MemberMessagePage from "../components/mobile/dashboard/main/MemberMessage
 import MemberLeftAsidePage from "../components/mobile/dashboard/leftaside/MemberLeftAsidePage.vue";
 import MemberPublishBlogPage from "../components/mobile/dashboard/leftasidelinkpages/MemberPublishBlogPage.vue";
 import HomeLeftAsidePage from "../components/mobile/dashboard/leftaside/HomeLeftAsidePage.vue";
-import FollowedLeftAsidePage from "../components/mobile/dashboard/leftaside/FollowedLeftAsidePage.vue";
 
 import BlogDetailPage from "../components/mobile/detail/BlogDetailPage.vue";
 import BlogDashboard from "../views/mobile/BlogDashboard.vue";
@@ -47,6 +46,11 @@ import SearchBlogDetail from "../components/mobile/detail/SearchBlogDetail.vue"
 import SearchMemberDetail from "../components/mobile/detail/SearchMemberDetail.vue"
 import SearchAllDetail from "../components/mobile/detail/SearchAllDetail.vue"
 import NewHomePage from "../components/mobile/dashboard/main/NewHomePage.vue"
+import FollowedRightAsidePage from "../components/mobile/dashboard/rightaside/FollowedRightAsidePage.vue";
+import VideoPage from "../components/mobile/dashboard/main/VideoPage.vue";
+import VideoPlayPage from "../components/mobile/detail/VideoPlayPage.vue";
+import PublishContentOP from "../components/mobile/dashboard/leftasidelinkpages/PublishContentOP.vue";
+import MemberPublishVideoPage from "../components/mobile/dashboard/leftasidelinkpages/MemberPublishVideoPage.vue";
 
 const routes = [
 
@@ -99,9 +103,18 @@ const routes = [
         left: MemberLeftAsidePage,
         main: MemberBlog,
         }},
+      {path: 'video', components: {
+        left: BlankPage,
+        main: VideoPage,
+      }},
+      {path: 'videoPlay', components: {
+        left: BlankPage,
+        main: VideoPlayPage,
+      }},
       {path: 'followedMembers', components: {
-        left: FollowedLeftAsidePage,
+        left: HomeLeftAsidePage,
         main: FollowedMembersPage,
+        right: FollowedRightAsidePage,
         }},
       {path: 'memberMessage', components: {
         left: BlankPage,
@@ -111,10 +124,15 @@ const routes = [
           left: BlankPage,
           main: MemberMessagePage,
         }},
-      {path: 'memberPublishBlog', components: {
+      { path: 'memberPublishBlog',
+        components: {
           left: MemberLeftAsidePage,
-          main: MemberPublishBlogPage,
-      }},
+          main: PublishContentOP,
+        },children: [
+          {path: '',redirect: '/mobileDashboard/memberPublishBlog/blog'},
+          {path: 'blog',component: MemberPublishBlogPage },
+          {path: 'video',component: MemberPublishVideoPage },
+        ]},
       {path: 'memberBlogDetail',name: 'BlogDetail',components: {
           left: BlankPage,
           main: BlogDetailPage,

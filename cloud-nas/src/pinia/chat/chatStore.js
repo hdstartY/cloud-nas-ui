@@ -4,8 +4,11 @@ import {h, ref} from "vue";
 import mRequest from "../../utils/MemberRequest.js";
 import {ElMessage, ElNotification} from "element-plus";
 import {useMessageOPStore} from "./UseMessageOPStore.js";
+import {useRouter} from "vue-router";
 
 export const useChatStore = defineStore('chat', () => {
+
+        const router = useRouter();
 
         const memberInfoStore = memberInfoShare()
         const messageOPStore = useMessageOPStore()
@@ -30,7 +33,7 @@ export const useChatStore = defineStore('chat', () => {
 
             // 创建WebSocket连接
             // const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            // const socketUrl = 'ws://localhost:8030/ws/chat?memberId=' + encodeURIComponent(memberId.value);
+            // const socketUrl = 'ws://192.168.0.103:8030/ws/chat?memberId=' + encodeURIComponent(memberId.value);
 
             // 自动适应当前网页协议和主机
             const socketUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/chat?memberId=' + encodeURIComponent(memberId.value);
@@ -96,9 +99,35 @@ export const useChatStore = defineStore('chat', () => {
                             'div',
                             {
                                 style: 'cursor: pointer',
-                                onClick: () => {
-                                    alert('通知被点击了')
-                                    // 可以在这里跳转、打开弹窗、做别的处理
+                                onClick: async () => {
+
+                                    try {
+                                        const response = await mRequest.get("/member/getById",{
+                                            params: {
+                                                id: msgObj.sendId
+                                            }
+                                        })
+                                        if (response.data.code === 200 && response.data.data !== null) {
+                                            chatMessages.value = [];
+                                            receiveId.value = msgObj.sendId;
+                                            receiveNickName.value = msgObj.sendNickName;
+                                            receiveAvatar.value = response.data.data.avatar;
+                                            isCover.value = true;
+                                            currentPage.value = 1;
+                                            hasMore.value = true;
+                                            chatWithId.value = msgObj.sendId;
+                                            router.push("/mobileDashboard/messageDetail")
+                                        } else {
+                                            ElMessage({
+                                                type: 'warning',
+                                                message: '未知错误'
+                                            })
+                                            console.log(response.data.msg);
+                                        }
+                                    } catch (e) {
+                                        console.log(e.message)
+                                    }
+
                                 }
                             },
                             [

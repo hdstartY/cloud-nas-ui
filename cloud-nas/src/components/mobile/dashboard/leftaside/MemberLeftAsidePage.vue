@@ -70,11 +70,15 @@ const toUpdateFile = () => {
 
 .box2:hover {
   background-color: rgb(208, 237, 250); /* 鼠标移上来时的颜色 */
+  transition: transform 0.3s ease;
+  transform: scale(1.1);
 }
 .box2-selected {
   background-color: skyblue;
 }
 .text-selected {
   color: skyblue;
+  transition: transform 0.3s ease;
+  transform: scale(1.1);
 }
 </style>

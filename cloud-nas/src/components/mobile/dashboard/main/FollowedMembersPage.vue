@@ -35,11 +35,12 @@
                 :preview-src-list="[img.oriUrl]"
                 :initial-index="index"
                 preview-teleported
+                style="transition: transform 0.3s ease;"
             />
           </template>
           <template v-else>
             <!-- 视频缩略图：点击后弹窗播放 -->
-            <img :src="img.preUrl" class="post-image video-thumb" />
+            <img :src="img.preUrl" class="post-image video-thumb" style="transition: transform 0.3s ease;"/>
             <span class="video-icon">▶</span>
           </template>
         </div>
@@ -53,13 +54,14 @@
           :before-close="handleDialogClose"
           class="video-dialog"
           :modal="false"
-          style="box-shadow: none;background-color: rgba(220, 223, 230, 0.64)"
+          style="box-shadow: none;background-color: black"
       >
         <video
             v-if="currentVideoUrl"
             :src="currentVideoUrl"
             controls
             autoplay
+            muted
             style="width: 100%; max-height: 70vh; background: #000"
         ></video>
       </el-dialog>
@@ -598,5 +600,7 @@ const toBlogDetailPage = (item) => {
 .video-dialog .el-dialog__body {
   padding-top: 0px;
 }
-
+.post-image:hover {
+  transform: scale(1.05); /* 放大1.05倍，可以根据需要调整 */
+}
 </style>

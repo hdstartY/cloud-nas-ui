@@ -69,6 +69,10 @@ export const followedMembersStore = defineStore('followed', () => {
                     } else {
                         followedBlogList.value = followedBlogList.value.concat(response.data.data)
                     }
+                    if (response.data.data.length < 20) {
+                        loading.value = false;
+                        hasMore.value = false;
+                    }
                     currentPage.value += 1;
                 } else {
                     hasMore.value = false;
@@ -123,6 +127,7 @@ export const followedMembersStore = defineStore('followed', () => {
 
     // 监听排序字段变化，自动请求数据
     watch(followedSortField, () => {
+        followedBlogList.value = []
         fetchFollowedBlogs()
     })
 

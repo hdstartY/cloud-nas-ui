@@ -45,12 +45,13 @@ export const useBlogDetailStore = defineStore('useBlogStore', () => {
                     } else {
                         comments.value = comments.value.concat(response.data.data)
                     }
+                    if (response.data.data.length < 15) {
+                        hasMore.value = false
+                        commentsLoading.value = false
+                        return;
+                    }
                     currentPage.value += 1;
                 } else {
-                    hasMore.value = false
-                    commentsLoading.value = false
-                }
-                if (response.data.data.length < 15) {
                     hasMore.value = false
                     commentsLoading.value = false
                 }

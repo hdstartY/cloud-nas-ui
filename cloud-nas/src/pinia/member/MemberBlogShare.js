@@ -59,6 +59,11 @@ export const memberBlogShare = defineStore('memberBlog', () => {
                     } else {
                         memberBlogList.value = memberBlogList.value.concat(response.data.data)
                     }
+                    if (response.data.data.length < 20) {
+                        loading.value = false;
+                        hasMore.value = false;
+                        return;
+                    }
                     currentPage.value += 1;
                 } else {
                     hasMore.value = false;

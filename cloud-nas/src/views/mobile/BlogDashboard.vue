@@ -16,7 +16,7 @@
 <!--       导航-->
         <div class="nav-main">
           <el-tooltip content="首页" effect="light"><div class="main-nav nav-home box" :class="{'text-selected':boxSelect === 1}"  @click="toHomePage()" ><el-icon style="font-size: 25px"><home-filled /></el-icon></div></el-tooltip>
-          <el-tooltip content="关注" effect="light"><div class="main-nav nav-follow box" :class="{'text-selected':boxSelect === 2}" @click="toFollowedMembersPage()" ><el-icon style="font-size: 25px"><star/></el-icon></div></el-tooltip>
+          <el-tooltip content="视频" effect="light"><div class="main-nav nav-follow box" :class="{'text-selected':boxSelect === 2}" @click="toVideoPage()" ><el-icon style="font-size: 25px"><video-play/></el-icon></div></el-tooltip>
           <el-tooltip content="我的" effect="light"><div class="main-nav nav-own box" :class="{'text-selected':boxSelect === 3}" @click="toMemberBlog()" ><el-icon style="font-size: 25px"><user-filled /></el-icon></div></el-tooltip>
           <el-tooltip content="信息" effect="light">
             <div  style="width: 136px;display: flex;justify-content: center;padding-top: 19px" class="msgbox" :class="{'text-selected':boxSelect === 4}" @click="toMemberMessagePage()">
@@ -69,7 +69,7 @@
 </template>
 
 <script setup>
-import {HomeFilled, Message, Star, UserFilled,Search} from "@element-plus/icons-vue";
+import {HomeFilled, Message, Star, UserFilled, Search, VideoPlay} from "@element-plus/icons-vue";
 import {useRouter,useRoute} from "vue-router";
 import {onMounted, ref,watch,nextTick} from "vue";
 import {ElMessage} from "element-plus";
@@ -182,9 +182,9 @@ const toHomePage = () => {
   boxSelect.value = 1;
   router.push("/mobileDashboard/home");
 }
-const toFollowedMembersPage = () => {
+const toVideoPage = () => {
   boxSelect.value = 2;
-  router.push("/mobileDashboard/followedMembers")
+  router.push("/mobileDashboard/video")
 }
 const toMemberBlog = () => {
   boxSelect.value = 3;

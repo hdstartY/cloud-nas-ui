@@ -14,18 +14,23 @@
     <div @click="toCategory()" class="box2" :class="{'text-selected':selectItem ===3}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
       <div style="display: flex;align-items: center"><el-icon><Operation /></el-icon></div>分类
     </div>
+    <div @click="toFollowedMembersPage()" class="box2" :class="{'text-selected':selectItem ===4}" style="font-size: 20px;display: flex;flex-direction: row;padding-left: 20px">
+      <div style="display: flex;align-items: center"><el-icon style="display: flex;align-items: center"><star/></el-icon></div>关注
+    </div>
   </div>
 </template>
 
 <script setup>
-import {Histogram, Operation, Refresh, TrendCharts} from "@element-plus/icons-vue";
+import {Histogram, Operation, Refresh, Star, TrendCharts} from "@element-plus/icons-vue";
 import {useRouter} from "vue-router";
 import {onBeforeUnmount, ref} from "vue";
 import {homeBlogStore} from "../../../../pinia/honeBlog/HomeBlogShared.js";
+import {useNewBlogStore} from "../../../../pinia/honeBlog/UseNewBlogStore.js";
 
 const selectItem = ref(1)
 const router = useRouter();
 const blogStore = homeBlogStore()
+const newBlogStore = useNewBlogStore()
 
 const toRecommend = () => {
   blogStore.blogList = []
@@ -33,12 +38,16 @@ const toRecommend = () => {
   router.push("/mobileDashboard/home")
 }
 const toNew = () => {
-  blogStore.blogList = []
+  newBlogStore.blogList = []
   selectItem.value = 2
   router.push("/mobileDashboard/newHome")
 }
 const toCategory = () => {
   selectItem.value = 3
+}
+const toFollowedMembersPage = () => {
+  selectItem.value = 4;
+  router.push("/mobileDashboard/followedMembers")
 }
 
 </script>
@@ -69,11 +78,15 @@ const toCategory = () => {
 
 .box2:hover {
   background-color: rgb(208, 237, 250); /* 鼠标移上来时的颜色 */
+  transition: transform 0.3s ease;
+  transform: scale(1.1);
 }
 .box2-selected {
   background-color: skyblue;
 }
 .text-selected {
   color: skyblue;
+  transition: transform 0.3s ease;
+  transform: scale(1.1);
 }
 </style>

@@ -12,6 +12,7 @@
       </el-form-item>
     </el-form>
   </div>
+  <div style="color: red;font-size: 13px;padding-left: 20px">注：单次上传文件大小不可大于200MB</div>
   <div style="display: flex;padding: 20px">
     <div style="width: 40px">
       <el-text style="font-size: 14px">图片</el-text>
